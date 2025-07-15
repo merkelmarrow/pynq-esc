@@ -3,7 +3,7 @@
 
 module rc_pwm_capture #(
     parameter C_COUNTER_WIDTH = 32,
-    parameter C_CLK_FREQ_HZ = 125_000_000 // PL clock frequency
+    parameter C_CLK_FREQ_HZ = 125_000_000 // self documentation
 )(
     input wire sysclk, // 125 MHz PL clock
     input wire rst_n, // active low synchronous reset
@@ -20,12 +20,22 @@ module rc_pwm_capture #(
         else
             sync <= {sync[1:0], rc_pwm_in};
     end
-    
+
+    // syncd input
     wire pwm_sync = sync[2];
     
-    // two cycle latency
-    wire rising = (sync[2:1] == 2'b01);
-    wire falling = (sync[2:1] == 2'b10);
+    // register delayed version of pwm_sync for clean edge detection
+    reg pwm_sync_d;
+    always @(posedge sysclk) begin
+        if (!rst_n)
+            pwm_sync_d <= 1'b0;
+        else
+            pwm_sync_d <= pwm_sync;
+    end
+    
+    // detect edges on syncd signal
+    wire rising = pwm_sync & ~pwm_sync_d;
+    wire falling = ~pwm_sync & pwm_sync_d;
     
     // free-running counter (wrap @ 2^C_COUNTER_WIDTH)
     // 32-bit wraps @ 34.36 s
