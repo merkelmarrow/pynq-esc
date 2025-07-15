@@ -2,12 +2,13 @@
 
 module rc_pwm_capture_tb;
 
-    localparam CLK_NS = 10; // 100 MHz
+    localparam CLK_NS = 8; // 125 MHz
     reg clk = 0;
     always #(CLK_NS/2) clk = ~clk;
     
     reg rst_n = 0;
     initial begin
+        rst_n = 0;
         repeat (5) @(posedge clk);
         rst_n = 1;
     end
@@ -15,6 +16,7 @@ module rc_pwm_capture_tb;
     reg pwm = 0;
     
     initial begin
+        wait (rst_n == 1);
         @(posedge rst_n);
         forever begin
             pwm = 1; #(1200_000); // 1.2 ms
@@ -30,7 +32,7 @@ module rc_pwm_capture_tb;
     wire flag;
     
     rc_pwm_capture uut(
-        .clk(clk), .rst_n(rst_n),
+        .sysclk(clk), .rst_n(rst_n),
         .rc_pwm_in(pwm),
         .pulse_width(width),
         .new_data(flag)

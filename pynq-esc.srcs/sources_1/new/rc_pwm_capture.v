@@ -2,7 +2,8 @@
 
 
 module rc_pwm_capture #(
-    parameter C_COUNTER_WIDTH = 32
+    parameter C_COUNTER_WIDTH = 32,
+    parameter C_CLK_FREQ_HZ = 125_000_000 // PL clock frequency
 )(
     input wire sysclk, // 125 MHz PL clock
     input wire rst_n, // active low synchronous reset
@@ -11,23 +12,29 @@ module rc_pwm_capture #(
     output reg new_data // "data is ready" pulse
     );
     
-    // three-FF synchroniser
+    // three-FF synchroniser, rst to 0 to avoid X-state after reset
     reg[2:0] sync;
     always @(posedge sysclk) begin
-        sync <= {sync[1:0], rc_pwm_in};
+        if (!rst_n)
+            sync <= 3'b000;
+        else
+            sync <= {sync[1:0], rc_pwm_in};
     end
+    
     wire pwm_sync = sync[2];
     
     // two cycle latency
     wire rising = (sync[2:1] == 2'b01);
     wire falling = (sync[2:1] == 2'b10);
     
-    // free-running counter
-    // overflow at ~43 s at 100 MHz
+    // free-running counter (wrap @ 2^C_COUNTER_WIDTH)
+    // 32-bit wraps @ 34.36 s
     reg[C_COUNTER_WIDTH-1:0] counter;
     always @(posedge sysclk) begin
-        counter <= counter + 1'b1;
-        if (!rst_n) counter <= {C_COUNTER_WIDTH{1'b0}};
+        if (!rst_n)
+            counter <= {C_COUNTER_WIDTH{1'b0}};
+        else
+            counter <= counter + 1'b1;
     end
     
     reg [C_COUNTER_WIDTH-1:0] t_start;
