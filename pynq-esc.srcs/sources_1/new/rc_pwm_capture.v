@@ -4,7 +4,7 @@
 module rc_pwm_capture #(
     parameter C_COUNTER_WIDTH = 32
 )(
-    input wire clk, // 100 MHz PL clock
+    input wire sysclk, // 125 MHz PL clock
     input wire rst_n, // active low synchronous reset
     input wire rc_pwm_in,
     output reg [C_COUNTER_WIDTH-1:0] pulse_width, // last width in clock cycles
@@ -13,7 +13,7 @@ module rc_pwm_capture #(
     
     // three-FF synchroniser
     reg[2:0] sync;
-    always @(posedge clk) begin
+    always @(posedge sysclk) begin
         sync <= {sync[1:0], rc_pwm_in};
     end
     wire pwm_sync = sync[2];
@@ -25,14 +25,14 @@ module rc_pwm_capture #(
     // free-running counter
     // overflow at ~43 s at 100 MHz
     reg[C_COUNTER_WIDTH-1:0] counter;
-    always @(posedge clk) begin
+    always @(posedge sysclk) begin
         counter <= counter + 1'b1;
         if (!rst_n) counter <= {C_COUNTER_WIDTH{1'b0}};
     end
     
     reg [C_COUNTER_WIDTH-1:0] t_start;
     
-    always @(posedge clk) begin
+    always @(posedge sysclk) begin
         new_data <= 1'b0; // default
         if (!rst_n) begin
             pulse_width <= 0;
