@@ -12,17 +12,25 @@ module rc_pwm_capture #(
     output reg new_data // "data is ready" pulse
     );
     
-    // three-FF synchroniser, rst to 0 to avoid X-state after reset
-    reg[2:0] sync;
+    // three-FF synchroniser
+    (* ASYNC_REG = "TRUE", IOB = "TRUE" *) reg sync_0;
+    (* ASYNC_REG = "TRUE" *) reg sync_1;
+    (* ASYNC_REG = "TRUE" *) reg sync_2;
+    
     always @(posedge sysclk) begin
-        if (!rst_n)
-            sync <= 3'b000;
-        else
-            sync <= {sync[1:0], rc_pwm_in};
+        if (!rst_n) begin
+            sync_0 <= 1'b0;
+            sync_1 <= 1'b0;
+            sync_2 <= 1'b0;
+        end else begin
+            sync_0 <= rc_pwm_in;
+            sync_1 <= sync_0;
+            sync_2 <= sync_1;
+        end
     end
 
     // syncd input
-    wire pwm_sync = sync[2];
+    wire pwm_sync = sync_2;
     
     // register delayed version of pwm_sync for clean edge detection
     reg pwm_sync_d;

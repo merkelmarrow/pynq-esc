@@ -16,7 +16,7 @@ module rc_pwm_capture_tb;
     reg pwm = 0;
     
     initial begin
-        wait (rst_n == 1);
+        @(negedge rst_n);
         @(posedge rst_n);
         forever begin
             pwm = 1; #(1200_000); // 1.2 ms
@@ -40,7 +40,7 @@ module rc_pwm_capture_tb;
     
     always @(posedge clk)
         if (flag) $display  ("Width captured = %0d ticks = %0.1f us",
-                                width, width/100.0);
+                                width, width/125.0);
     initial begin
         #500_000_000 $finish; // 0.5 s sim
     end
