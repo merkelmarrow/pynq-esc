@@ -1,6 +1,16 @@
-pynq-esc.cache/
-pynq-esc.hw/
-pynq-esc.sim/
-pynq-esc.ip_user_files/
-pynq-esc.runs/
-pynq-esc.srcs/utils_1/imports/
+# Vivado-generated
+*.jou
+*.log
+*.str
+*.dmp
+*.wdb
+*.wcfg
+
+# Project-local output dirs
+*.runs/
+*.cache/
+*.sim/
+*.hw/
+*.ip_user_files/
+*.xsa
+*.ltx
