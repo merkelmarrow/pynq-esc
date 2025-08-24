@@ -6,6 +6,7 @@
 *.wdb
 *.wcfg
 
+
 # Project-local output dirs
 *.runs/
 *.cache/
@@ -14,3 +15,9 @@
 *.ip_user_files/
 *.xsa
 *.ltx
+
+*.veo
+*.dcp
+*.xml
+*.bmj
+*.txt
