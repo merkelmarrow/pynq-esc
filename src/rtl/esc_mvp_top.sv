@@ -7,7 +7,7 @@
 // Design Name: 
 // Module Name: esc_mvp_top
 // Project Name: PYNQ ESC
-// Target Devices: 
+// Target Devices: PYNQ-Z2
 // Tool Versions: 
 // Description: 
 // 
@@ -56,15 +56,15 @@ module esc_mvp_top(
     end
     
     // hold MMCM #2 in reset until lock is stable for a few cycles
-    reg [5:0]holdoff;
+    reg [3:0]holdoff;
     reg mmcm2_rst_r; // drives MMCM2 reset pin
     
     always @(posedge mclk or negedge rst_n) begin
         if (!rst_n) begin
-            holdoff <= 6'b111111;
+            holdoff <= 4'b1111;
             mmcm2_rst_r <= 1'b1;
         end else if (!lock_sync[1]) begin
-            holdoff <= 6'b111111;
+            holdoff <= 4'b1111;
             mmcm2_rst_r <= 1'b1;
         end else if (holdoff != 0) begin
             holdoff <= holdoff - 1'b1;
