@@ -23,13 +23,12 @@
 module timing_hub #(
     parameter integer PWM_TICKS = 4096, // ctrl ticks per pwm period
     parameter integer TS_TICKS = 512, // approximate ctrl ticks per sampling period
-    parameter integer DCLK_PER_TS = 128, // dclk ticks per sampling period
     parameter integer READ_DCLKS = 24, // bits per ADC sample
     parameter integer COMPUTE_BUDGET = 416, // ctrl ticks available for pwm compute
     parameter integer SETTLE_TS_MIN = 7, // minimum ADC settling delay
     parameter integer DCLK_RATIO_NOM = 4, // expected ctrl ticks per dclk tick
     parameter integer DCLK_RATIO_TOL = 1, // tolerance for expected ctrl ticks per dclk (\pm TOL)
-    parameter integer DCLK_GOOD_COUNT = 256, // consecutive good dclk cycles during DCLKCHK
+    parameter integer DCLK_GOOD_COUNT = 255, // consecutive good dclk cycles during DCLKCHK
     parameter integer PWM_PHASE_OFFSET = 0,
     parameter integer HB_TIMEOUT_TICKS = 64 // dclk heartbeat timeout in ctrl ticks
     ) (
@@ -137,6 +136,7 @@ module timing_hub #(
         dclk_sync <= dclk_csync[2];
         dclk_sync_q <= dclk_sync;
         
+        // free run counter for dclk period measurements
         tick_counter <= tick_counter + 16'd1;
         
         if (rst_ctrl) begin
@@ -145,6 +145,7 @@ module timing_hub #(
             dclk_ok <= 1'b0;
             settle_counter <= 16'd0;
             
+            tick_counter <= 16'd0;
             last_cap <= 8'd0;
             have_cap <= 1'b0;
         end else begin
@@ -198,6 +199,7 @@ module timing_hub #(
     reg [11:0]phase_cnt;
     
     wire at_wrap = (pwm_ctr == (PWM_TICKS[11:0] - 12'd1));
+    wire almost_at_wrap = (pwm_ctr == (PWM_TICKS[11:0] - 12'd2));
     wire hold_pwm = (realign_mode && at_wrap) || arm_pend;
     
     always @(posedge clk_ctrl) begin
@@ -213,10 +215,8 @@ module timing_hub #(
                 pwm_ctr_en <= 1'b1;
             end
             
-            if (pwm_ctr_en) begin
-                if (hold_pwm);
-                else
-                    pwm_ctr <= at_wrap ? 12'd0 : (pwm_ctr + 12'd1);
+            if (pwm_ctr_en && !hold_pwm) begin
+                pwm_ctr <= at_wrap ? 12'd0 : (pwm_ctr + 12'd1);
             end
             
             if (arm_pend) begin
@@ -257,11 +257,12 @@ module timing_hub #(
             end
             
             if (at_wrap && !hold_pwm) begin
+                drdy_idx <= 3'd0;
                 seen_idx7 <= 1'b0;
                 missed_deadline <= 1'b0;
             end
             
-            if (state == ST_DRDYWAIT) begin
+            if (state == ST_DRDYWAIT || state == ST_REALIGN) begin
                 drdy_idx <= 3'd0;
                 seen_idx7 <= 1'b0;
                 missed_deadline <= 1'b0;
@@ -273,14 +274,11 @@ module timing_hub #(
     // maintain pwm as timebase across fault and reset
     // soft realign freezes at wrap, hard reset doesn't freeze pwm until realign stage
     
-    reg adc_sync_req_pend; // one shot pulse generator
-    
     always @(posedge clk_ctrl) begin
         if (rst_ctrl) begin
             state <= ST_RESET;
             fault <= 1'b0;
             adc_sync_req <= 1'b0;
-            adc_sync_req_pend <= 1'b0;
             arm_pend <= 1'b0;
             phase_cnt <= 12'd0;
             realign_mode <= 1'b0;
@@ -319,25 +317,33 @@ module timing_hub #(
                 
                 ST_RUN: begin
                     realign_mode <= 1'b0;
+                    // assert realign_mode one tick before wrap so counter freezes exactly at wrap
+                    if (missed_deadline && almost_at_wrap && !hold_pwm) begin
+                        realign_mode <= 1'b1;
+                    end
                     
                     if (hb_tripped || !mmcm1_locked || !mmcm2_locked) begin
                         fault <= 1'b1;
-                        adc_sync_req <= 1'b1;
-                        adc_sync_req_pend <= 1'b1;
-                        state <= ST_FAULT
+                        adc_sync_req <= 1'b1; // one cycle pulse
+                        state <= ST_FAULT;
                     end else begin
                         // period end decisions evald at last tick
-                        if (at_wrap && !hold_pwm) begin
-                            if (!seen_idx7) begin
-                                // no idx 7 this period, hard reset
-                                fault <= 1'b1;
-                                adc_sync_req <= 1'b1;
-                                adc_sync_req_pend <= 1'b1;
-                                state <= ST_FAULT;
-                            end else if (missed_deadline) begin
-                                // saw idx7 but missed deadline, soft reset
-                                realign_mode <= 1'b1;
-                                state <= ST_REALIGN;
+                        if (at_wrap) begin
+                            if (!hold_pwm) begin
+                                if (!seen_idx7) begin
+                                    // no idx 7 this period, hard reset
+                                    fault <= 1'b1;
+                                    adc_sync_req <= 1'b1;
+                                    state <= ST_FAULT;
+                                end else if (missed_deadline) begin
+                                    // saw idx7 but missed deadline, soft reset
+                                    realign_mode <= 1'b1;
+                                    state <= state <= ST_REALIGN;
+                                end
+                            end else begin
+                                if (missed_deadline) begin
+                                    state <= ST_REALIGN;
+                                end
                             end
                         end
                     end
@@ -359,11 +365,6 @@ module timing_hub #(
                     // recheck DCLK stability for >= 7*Ts after sync
                     // return through DCLKCHK, then pause at PWM wrap and wait for DRDY
                     fault <= 1'b1;
-                    // ensures adc_sync_req is a pulse
-                    if (adc_sync_req_pend) begin
-                        adc_sync_req <= 1'b0;
-                        adc_sync_req_pend <= 1'b0;
-                    end
                     
                     if (mmcm1_locked && mmcm2_locked) begin
                         state <= ST_DCLKCHK;
