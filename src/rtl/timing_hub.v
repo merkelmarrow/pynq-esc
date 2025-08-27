@@ -193,14 +193,20 @@ module timing_hub #(
         end
     end
     
+    // command pulses from FSM
+    reg cmd_align_now;
+    reg cmd_request_realign;
+    
     // pwm timebase for freeze at wrap and phase offset
-    reg realign_mode;
+    reg realign_active;
+    reg realign_arm;
     reg arm_pend; // hold PWM while applying phase offset
     reg [11:0]phase_cnt;
     
     wire at_wrap = (pwm_ctr == (PWM_TICKS[11:0] - 12'd1));
     wire almost_at_wrap = (pwm_ctr == (PWM_TICKS[11:0] - 12'd2));
-    wire hold_pwm = (realign_mode && at_wrap) || arm_pend;
+    wire early_almost_wrap = pwm_ctr == (PWM_TICKS[11:0] - 12'd3);
+    wire hold_pwm = (realign_active && at_wrap) || arm_pend;
     
     always @(posedge clk_ctrl) begin
         if (rst_ctrl) begin
@@ -208,16 +214,23 @@ module timing_hub #(
             pwm_ctr_en <= 1'b0; // arm after first DRDY
             arm_pend <= 1'b0;
             phase_cnt <= 12'd0;
-            realign_mode <= 1'b0;
+            realign_active <= 1'b0;
+            realign_arm <= 1'b0;
         end else begin
             // default: enable once armed, never disabled after reset
             if (!pwm_ctr_en && (state != ST_RESET)) begin
                 pwm_ctr_en <= 1'b1;
             end
             
-            if (pwm_ctr_en && !hold_pwm) begin
-                pwm_ctr <= at_wrap ? 12'd0 : (pwm_ctr + 12'd1);
-            end
+            if (cmd_align_now) begin
+                pwm_ctr <= 12'd0;
+                phase_cnt <= 12'd0;
+                arm_pend <= (PWM_PHASE_OFFSET != 0);
+                realign_active <= 1'b0; // cancel freeze
+                realign_arm <= 1'b0; // cancel pending freeze
+                end else if (pwm_ctr && !hold_pwm) begin
+                    pwm_ctr <= at_wrap ? 12'd0 : (pwm_ctr + 12'd1);
+                end
             
             if (arm_pend) begin
                 if (phase_cnt == PWM_PHASE_OFFSET[11:0]) begin
@@ -226,6 +239,21 @@ module timing_hub #(
                     phase_cnt <= phase_cnt + 12'd1;
                 end
             end
+            
+            if (cmd_request_realign) begin
+                realign_arm <= 1'b1;
+            end
+            
+            // convert latched request into a freeze-at-wrap
+            // assert realign_active exactly one tick before wrap
+            // this is evald after the FSM's early request has been registered
+            if (realign_arm && almost_at_wrap && !hold_pwm) begin
+                realign_active <= 1'b1; // makes hold_pwm true at wrap
+                realign_arm <= 1'b0;
+            end
+            
+            // once at wrap and holding, counter freezes
+            // release occurs at cmd_align_now on DRDY in ST_REALIGN
         end
     end
     
@@ -256,6 +284,7 @@ module timing_hub #(
                 drdy_idx <= drdy_idx + 3'd1;
             end
             
+            // housekeeping
             if (at_wrap && !hold_pwm) begin
                 drdy_idx <= 3'd0;
                 seen_idx7 <= 1'b0;
@@ -271,25 +300,36 @@ module timing_hub #(
     end
     
     // finite state machine
-    // maintain pwm as timebase across fault and reset
-    // soft realign freezes at wrap, hard reset doesn't freeze pwm until realign stage
+    // uses early_almost_wrap to schedule a freeze that engages at the next cycle
+        // so the counter actually holds at wrap
+    // need_realign tracked to not miss scheduling window
+    // missed deadline -> soft reset, freeze at wrap until next DRDY
+    // no 8th sample -> hard reset, SPI reset ADC, leave PWM running with previous
+        // compute until ADC settled, then soft reset
+        
+    reg need_realign;
+    
     
     always @(posedge clk_ctrl) begin
         if (rst_ctrl) begin
             state <= ST_RESET;
             fault <= 1'b0;
             adc_sync_req <= 1'b0;
-            arm_pend <= 1'b0;
-            phase_cnt <= 12'd0;
-            realign_mode <= 1'b0;
+            cmd_align_now <= 1'b0;
+            cmd_request_realign <= 1'b0;
+            need_realign <= 1'b0;
         end else begin
             // defaults
             adc_sync_req <= 1'b0;
             fault <= 1'b0;
+            cmd_align_now <= 1'b0;
+            cmd_request_realign <= 1'b0;
+            
+            if (missed_deadline) need_realign <= 1'b1;
             
             case (state)
                 ST_RESET: begin
-                    realign_mode <= 1'b0;
+                    need_realign <= 1'b0;
                     arm_pend <= 1'b0;
                     if (mmcm1_locked && mmcm2_locked) begin
                         state <= ST_DCLKCHK;
@@ -297,7 +337,7 @@ module timing_hub #(
                 end
                 
                 ST_DCLKCHK: begin
-                    realign_mode <= 1'b0;
+                    need_realign <= 1'b0;
                     arm_pend <= 1'b0;
                     if (mmcm1_locked && mmcm2_locked && dclk_ok && settle_done) begin
                         state <= ST_DRDYWAIT;
@@ -305,26 +345,24 @@ module timing_hub #(
                 end
                 
                 ST_DRDYWAIT: begin
-                    realign_mode <= 1'b0;
+                    need_realign <= 1'b0;
                     // align PWM start to next DRDY + optional phase offset
                     if (drdy_pulse) begin
-                        pwm_ctr <= 12'd0;
-                        phase_cnt <= 12'd0;
-                        arm_pend <= (PWM_PHASE_OFFSET != 0);
+                        cmd_align_now <= 1'b1; // timebase will zero ctr and start phase
                         state <= ST_RUN;
                     end
                 end
                 
                 ST_RUN: begin
-                    realign_mode <= 1'b0;
-                    // assert realign_mode one tick before wrap so counter freezes exactly at wrap
-                    if (missed_deadline && almost_at_wrap && !hold_pwm) begin
-                        realign_mode <= 1'b1;
+                    // schedule freeze at wrap, assert request at early_almost_wrap
+                    if (need_realign && early_almost_wrap && !hold_pwm) begin
+                        cmd_request_realign <= 1'b1; // timebase will assert realign_active at almost_at_wrap
                     end
                     
                     if (hb_tripped || !mmcm1_locked || !mmcm2_locked) begin
                         fault <= 1'b1;
                         adc_sync_req <= 1'b1; // one cycle pulse
+                        need_realign <= 1'b0;
                         state <= ST_FAULT;
                     end else begin
                         // period end decisions evald at last tick
@@ -334,29 +372,23 @@ module timing_hub #(
                                     // no idx 7 this period, hard reset
                                     fault <= 1'b1;
                                     adc_sync_req <= 1'b1;
+                                    need_realign <= 1'b0;
                                     state <= ST_FAULT;
-                                end else if (missed_deadline) begin
-                                    // saw idx7 but missed deadline, soft reset
-                                    realign_mode <= 1'b1;
-                                    state <= state <= ST_REALIGN;
-                                end
+                                end 
+                                need_realign <= 1'b0;
                             end else begin
-                                if (missed_deadline) begin
-                                    state <= ST_REALIGN;
-                                end
+                                state <= ST_REALIGN;
+                                need_realign <= 1'b0;
                             end
                         end
                     end
                 end
                 
                 ST_REALIGN: begin
-                    // freeze only at wrap, continue at next drdy
-                    fault <= 1'b0;
+                    // freeze is active, continue at next drdy 
                     if (drdy_pulse) begin
-                        realign_mode <= 1'b0;
-                        pwm_ctr <= 12'd0;
-                        phase_cnt <= 12'd0;
-                        arm_pend <= (PWM_PHASE_OFFSET != 0);
+                        cmd_align_now <= 1'b1; // re-arms phase
+                        need_realign <= 1'b0;
                         state <= ST_RUN;
                     end
                 end
@@ -365,7 +397,7 @@ module timing_hub #(
                     // recheck DCLK stability for >= 7*Ts after sync
                     // return through DCLKCHK, then pause at PWM wrap and wait for DRDY
                     fault <= 1'b1;
-                    
+                    need_realign <= 1'b0;
                     if (mmcm1_locked && mmcm2_locked) begin
                         state <= ST_DCLKCHK;
                     end
