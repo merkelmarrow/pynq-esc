@@ -208,7 +208,10 @@ module timing_hub #(
     wire at_wrap = (pwm_ctr == (PWM_TICKS[11:0] - 12'd1));
     wire almost_at_wrap = (pwm_ctr == (PWM_TICKS[11:0] - 12'd2));
     wire early_almost_wrap = pwm_ctr == (PWM_TICKS[11:0] - 12'd3);
-    wire hold_pwm = (realign_active && at_wrap) || arm_pend;
+    
+    // hold only while phase_cnt is strictly less than offset
+    wire phase_hold = arm_pend && (phase_cnt < PWM_PHASE_OFFSET[11:0]);
+    wire hold_pwm = (realign_active && at_wrap) || phase_hold;
     
     // command pulses from FSM
     reg cmd_align_now;
