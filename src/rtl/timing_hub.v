@@ -199,20 +199,21 @@ module timing_hub #(
         end
     end
     
-    // command pulses from FSM
-    reg cmd_align_now;
-    reg cmd_request_realign;
-    
     // pwm timebase for freeze at wrap and phase offset
     reg realign_active;
-    reg realign_arm;
-    reg arm_pend; // hold PWM while applying phase offset
+    reg realign_pending;
+    reg arm_pend; // apply PWM_PHASE_OFFSET after align_now
     reg [11:0]phase_cnt;
     
     wire at_wrap = (pwm_ctr == (PWM_TICKS[11:0] - 12'd1));
     wire almost_at_wrap = (pwm_ctr == (PWM_TICKS[11:0] - 12'd2));
     wire early_almost_wrap = pwm_ctr == (PWM_TICKS[11:0] - 12'd3);
     wire hold_pwm = (realign_active && at_wrap) || arm_pend;
+    
+    // command pulses from FSM
+    reg cmd_align_now;
+    reg cmd_request_realign;
+
     
     always @(posedge clk_ctrl) begin
         if (rst_ctrl) begin
@@ -221,14 +222,14 @@ module timing_hub #(
             arm_pend <= 1'b0;
             phase_cnt <= 12'd0;
             realign_active <= 1'b0;
-            realign_arm <= 1'b0;
+            realign_pending <= 1'b0;
         end else begin            
             if (cmd_align_now) begin
                 pwm_ctr <= 12'd0;
                 phase_cnt <= 12'd0;
                 arm_pend <= (PWM_PHASE_OFFSET != 0);
                 realign_active <= 1'b0; // cancel freeze
-                realign_arm <= 1'b0; // cancel pending freeze
+                realign_pending <= 1'b0;
                 pwm_ctr_en <= 1'b1;
             end 
 
@@ -245,15 +246,15 @@ module timing_hub #(
             end
             
             if (cmd_request_realign) begin
-                realign_arm <= 1'b1;
+                realign_pending <= 1'b1;
             end
             
             // convert latched request into a freeze-at-wrap
             // assert realign_active exactly one tick before wrap
             // this is evald after the FSM's early request has been registered
-            if (realign_arm && almost_at_wrap && !hold_pwm) begin
+            if (realign_pending && almost_at_wrap && !hold_pwm) begin
                 realign_active <= 1'b1; // makes hold_pwm true at wrap
-                realign_arm <= 1'b0;
+                realign_pending <= 1'b0;
             end
             
             // once at wrap and holding, counter freezes
@@ -264,6 +265,8 @@ module timing_hub #(
     // drdy indexing and compute trigger gating by deadline
     reg seen_idx7;
     reg missed_deadline;
+    
+    wire idx7_this_tick = (frame_pulse && (drdy_idx == 3'd7));
     
     always @(posedge clk_ctrl) begin
         if (rst_ctrl) begin
@@ -277,7 +280,6 @@ module timing_hub #(
             if (frame_pulse) begin
                 // gate compute strictly before deadline
                 if (state == ST_RUN && (drdy_idx == 3'd7)) begin
-                    seen_idx7 <= 1'b1;
                     if (pwm_ctr < DEADLINE_TICKS) begin
                         compute_trig <= 1'b1;
                     end else begin
@@ -286,6 +288,10 @@ module timing_hub #(
                 end
                 
                 drdy_idx <= drdy_idx + 3'd1;
+            end
+            
+            if (idx7_this_tick) begin
+                seen_idx7 <= 1'b1;
             end
             
             // housekeeping
@@ -336,7 +342,6 @@ module timing_hub #(
             case (state)
                 ST_RESET: begin
                     need_realign <= 1'b0;
-                    arm_pend <= 1'b0;
                     if (mmcm1_locked && mmcm2_locked) begin
                         state <= ST_DCLKCHK;
                     end
@@ -344,7 +349,6 @@ module timing_hub #(
                 
                 ST_DCLKCHK: begin
                     need_realign <= 1'b0;
-                    arm_pend <= 1'b0;
                     if (mmcm1_locked && mmcm2_locked && dclk_ok && settle_done) begin
                         state <= ST_DRDYWAIT;
                     end
@@ -374,7 +378,7 @@ module timing_hub #(
                         // period end decisions evald at last tick
                         if (at_wrap) begin
                             if (!hold_pwm) begin
-                                if (!seen_idx7) begin
+                                if (!(seen_idx7 || idx7_this_tick)) begin
                                     // no idx 7 this period, hard reset
                                     fault <= 1'b1;
                                     adc_sync_req <= 1'b1;
