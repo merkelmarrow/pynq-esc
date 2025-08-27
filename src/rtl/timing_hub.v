@@ -106,11 +106,18 @@ module timing_hub #(
     
     reg drdy_pulse, frame_pulse;
     always @(posedge clk_ctrl) begin
-        cdc_drdy_sync <= {cdc_drdy_sync[1:0], d_tog_drdy};
-        cdc_frame_sync <= {cdc_frame_sync[1:0], d_tog_frame};
-        
-        drdy_pulse  <= (cdc_drdy_sync[2]  ^ cdc_drdy_sync[1]); // 1-cycle pulse
-        frame_pulse <= (cdc_frame_sync[2] ^ cdc_frame_sync[1]);
+        if (rst_ctrl) begin
+            cdc_drdy_sync <= 3'd0;
+            cdc_frame_sync <= 3'd0;
+            drdy_pulse <= 1'b0;
+            frame_pulse <= 1'b0;
+        end else begin
+            cdc_drdy_sync <= {cdc_drdy_sync[1:0], d_tog_drdy};
+            cdc_frame_sync <= {cdc_frame_sync[1:0], d_tog_frame};
+            
+            drdy_pulse  <= (cdc_drdy_sync[2]  ^ cdc_drdy_sync[1]); // 1-cycle pulse
+            frame_pulse <= (cdc_frame_sync[2] ^ cdc_frame_sync[1]);
+        end
     end
     
     // clk_ctrl DCLK stability check
@@ -123,9 +130,8 @@ module timing_hub #(
     reg [15:0]tick_counter;
     reg dclk_ok;
     reg [15:0]settle_counter;
-    
     reg [7:0]last_cap; // timestamp of last capture
-    reg have_cap; // do we have a last capture to compare against
+    reg have_cap; // do we have a last capture to compare against  
     
     wire settle_done = (settle_counter >= (SETTLE_TS_MIN * TS_TICKS));
     wire dclk_rise = (dclk_sync & ~dclk_sync_q);
@@ -211,26 +217,24 @@ module timing_hub #(
     always @(posedge clk_ctrl) begin
         if (rst_ctrl) begin
             pwm_ctr <= 12'd0;
-            pwm_ctr_en <= 1'b0; // arm after first DRDY
+            pwm_ctr_en <= 1'b0; // arm after first cmd_align_now
             arm_pend <= 1'b0;
             phase_cnt <= 12'd0;
             realign_active <= 1'b0;
             realign_arm <= 1'b0;
-        end else begin
-            // default: enable once armed, never disabled after reset
-            if (!pwm_ctr_en && (state != ST_RESET)) begin
-                pwm_ctr_en <= 1'b1;
-            end
-            
+        end else begin            
             if (cmd_align_now) begin
                 pwm_ctr <= 12'd0;
                 phase_cnt <= 12'd0;
                 arm_pend <= (PWM_PHASE_OFFSET != 0);
                 realign_active <= 1'b0; // cancel freeze
                 realign_arm <= 1'b0; // cancel pending freeze
-                end else if (pwm_ctr && !hold_pwm) begin
-                    pwm_ctr <= at_wrap ? 12'd0 : (pwm_ctr + 12'd1);
-                end
+                pwm_ctr_en <= 1'b1;
+            end 
+
+            else if (pwm_ctr_en && !hold_pwm) begin
+                pwm_ctr <= at_wrap ? 12'd0 : (pwm_ctr + 12'd1);
+            end
             
             if (arm_pend) begin
                 if (phase_cnt == PWM_PHASE_OFFSET[11:0]) begin
@@ -306,6 +310,8 @@ module timing_hub #(
     // missed deadline -> soft reset, freeze at wrap until next DRDY
     // no 8th sample -> hard reset, SPI reset ADC, leave PWM running with previous
         // compute until ADC settled, then soft reset
+        
+    
         
     reg need_realign;
     
