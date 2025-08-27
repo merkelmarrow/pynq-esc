@@ -24,7 +24,7 @@ module timing_hub #(
     parameter integer PWM_TICKS = 4096, // ctrl ticks per pwm period
     parameter integer TS_TICKS = 512, // approximate ctrl ticks per sampling period
     parameter integer READ_DCLKS = 24, // bits per ADC sample
-    parameter integer COMPUTE_BUDGET = 416, // ctrl ticks available for pwm compute
+    parameter integer COMPUTE_BUDGET = 399, // ctrl ticks available for pwm compute
     parameter integer SETTLE_TS_MIN = 7, // minimum ADC settling delay
     parameter integer DCLK_RATIO_NOM = 4, // expected ctrl ticks per dclk tick
     parameter integer DCLK_RATIO_TOL = 1, // tolerance for expected ctrl ticks per dclk (\pm TOL)
