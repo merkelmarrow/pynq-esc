@@ -21,10 +21,60 @@
 
 
 module esc_mvp_top(
-    input clk_125_in,
-    input rst_n,
-    output adc_mclk_out,
-    output pwm_out
+
+    // INPUTS
+    
+    // PYNQ
+    input wire clk_125_in,
+    input wire rst_n,
+    
+    // adc
+    input wire dclk,
+    input wire drdy,
+    input wire adc_d0,
+    input wire adc_d1,
+    input wire adc_d2,
+    input wire adc_d3,
+    input wire adc_d4,
+    
+    // sensors
+    input wire hall_1,
+    input wire hall_2,
+    input wire hall_3,
+    input wire enc_A,
+    input wire enc_B,
+    
+    // gate driver
+    input wire nfault,
+    // xadc instantiation later
+    
+    // SPI
+    input wire miso,
+    
+    // hot swap controller
+    input wire pgd,
+    
+    // OUTPUTS
+    
+    // SPI
+    output wire sclk,
+    output wire mosi,
+    output wire drv_cs_n,
+    output wire adc_cs_n,
+    
+    // gate driver
+    output wire inlc,
+    output wire inhc,
+    output wire inlb,
+    output wire inhb,
+    output wire inla,
+    output wire inha,
+    output wire drv_en,
+    
+    // adc
+    output wire adc_mclk_out,
+    output wire adc_rst_n
+    
     );
     
     wire mclk;
@@ -92,20 +142,32 @@ module esc_mvp_top(
     end
     wire rst_ctrl = rst_sync[0]; // active high inside clk_ctrl
     
-    // divider to scope output from clk_ctrl
-    reg [20:0] div_cnt;
-    reg div_tog;
+    // new code starting here
     
-    always @(posedge clk_ctrl or posedge rst_ctrl) begin
-        if (rst_ctrl) begin
-            div_cnt <= 21'b0;
-            div_tog <= 1'b0;
-        end else begin
-            div_cnt <= div_cnt + 1'b1;
-            if (div_cnt == 21'b0) // toggles every 2^21 cycles
-                div_tog <= ~div_tog;
-        end
-    end
-    assign pwm_out = div_tog; // probe output
+    reg [11:0]pwm_phase;
+    reg pwm_ctr_en;
+    reg compute_trig;
+    reg [2:0]drdy_idx;
+    reg timing_fault;
+    reg adc_sync_req;
+    reg timing_state;
+   
+    timing_hub u_timing (
+        .clk_ctrl(clk_ctrl),
+        .rst_ctrl(rst_ctrl),
+        .dclk(dclk),
+        .drdy(drdy),
+        .mmcm1_locked(mmcm1_locked),
+        .mmcm2_locked(mmcm2_locked),
+        .pwm_ctr(pwm_phase),
+        .pwm_ctr_en(pwm_ctr_en),
+        .compute_trig(compute_trig),
+        .drdy_idx(drdy_idx),
+        .fault(timing_fault),
+        .adc_sync_req(adc_sync_req),
+        .state(timing_state)
+    );
+    
+    // new code ending here
     
 endmodule
