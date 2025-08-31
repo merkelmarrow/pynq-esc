@@ -35,7 +35,6 @@ module timing_hub #(
     input wire clk_ctrl,
     input wire rst_ctrl,
     input wire dclk,
-    input wire rst_dclk_n,
     
     input wire drdy,
     
@@ -61,11 +60,19 @@ module timing_hub #(
         ST_REALIGN = 3'd4,
         ST_FAULT = 3'd5;
         
+    
+        
     // dclk domain block
     // negative edge dclk sampling of drdy
     // count 24 dclk negedges to complete a frame read
     // emit 2 CDC toggles into clk_ctrl: drdy_seen, frame_done
-    wire rst_dclk = ~rst_dclk_n;
+    
+    (* ASYNC_REG = "true" *) reg [1:0]rst_dclk_sync;
+    always @(negedge dclk or posedge rst_ctrl) begin
+        if (rst_ctrl) rst_dclk_sync <= 2'b11;
+        else rst_dclk_sync <= {1'b0, rst_dclk_sync[1]};
+    end
+    wire rst_dclk = rst_dclk_sync[0]; // active high in dclk domain
     
     reg d_in_frame;
     reg [5:0]dclk_count; // counts 0-23 during sampling
