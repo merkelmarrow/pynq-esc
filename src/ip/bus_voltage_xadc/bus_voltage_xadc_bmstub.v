@@ -16,7 +16,10 @@ module bus_voltage_xadc (
   reset_in,
   vp_in,
   vn_in,
+  vauxp13,
+  vauxn13,
   channel_out,
+  muxaddr_out,
   eoc_out,
   alarm_out,
   eos_out,
@@ -49,8 +52,15 @@ module bus_voltage_xadc (
   input vp_in;
   (* X_INTERFACE_INFO = "xilinx.com:interface:diff_analog_io:1.0 Vp_Vn V_N" *)
   input vn_in;
+  (* X_INTERFACE_INFO = "xilinx.com:interface:diff_analog_io:1.0 Vaux13 V_P" *)
+  (* X_INTERFACE_MODE = "slave Vaux13" *)
+  input vauxp13;
+  (* X_INTERFACE_INFO = "xilinx.com:interface:diff_analog_io:1.0 Vaux13 V_N" *)
+  input vauxn13;
   (* X_INTERFACE_IGNORE = "true" *)
   output [4:0]channel_out;
+  (* X_INTERFACE_IGNORE = "true" *)
+  output [4:0]muxaddr_out;
   (* X_INTERFACE_IGNORE = "true" *)
   output eoc_out;
   (* X_INTERFACE_IGNORE = "true" *)

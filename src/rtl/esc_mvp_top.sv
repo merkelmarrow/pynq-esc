@@ -188,8 +188,8 @@ module esc_mvp_top(
     wire xadc_eoc, xadc_drdy;
     wire [15:0]xadc_do_s;
     
-    // always read the vp/vn status register (0x03)
-    localparam [6:0]DADDR_VPVN = 7'h03;
+    // always read VAUX13 (arduino a5) status register (0x1D)
+    localparam [6:0]DADDR_VAUX13 = 7'h1D;
     
     // one pulse read per conversion
     // den = DRP enable
@@ -198,7 +198,7 @@ module esc_mvp_top(
     wire xadc_den = xadc_eoc;
     
     bus_voltage_xadc u_bus_voltage (
-        .daddr_in (DADDR_VPVN),
+        .daddr_in (DADDR_VAUX13),
         .dclk_in (clk_ctrl),
         .den_in (xadc_den),
         .di_in (16'h0000), // never reconfiguring at run time
@@ -215,8 +215,11 @@ module esc_mvp_top(
         .eos_out (),
         .alarm_out (),
         
-        .vp_in (ar_an5_p),
-        .vn_in (ar_an5_n)
+        .vauxp13 (ar_an5_p),
+        .vauxn13 (ar_an5_n),
+        
+        .vp_in (),
+        .vn_in ()
     );
     
     // capture the bus signal when drdy asserts
