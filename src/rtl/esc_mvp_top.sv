@@ -37,6 +37,10 @@ module esc_mvp_top(
     input wire adc_d3,
     input wire adc_d4,
     
+    // xadc
+    input wire ar_an5_p,
+    input wire ar_an5_n,
+    
     // sensors
     input wire hall_1,
     input wire hall_2,
@@ -46,7 +50,6 @@ module esc_mvp_top(
     
     // gate driver
     input wire nfault,
-    // xadc instantiation later
     
     // SPI
     input wire miso,
@@ -73,9 +76,47 @@ module esc_mvp_top(
     
     // adc
     output wire adc_mclk_out,
-    output wire adc_rst_n
+    output wire adc_rst_n,
     
+    // xadc bus voltage
+    output wire [11:0]bus_voltage,
+    
+    // debug outputs to PS
+    output wire rst_n_q,
+    output wire dclk_q,
+    output wire drdy_q,
+    output wire adc_d0_q,
+    output wire adc_d1_q,
+    output wire adc_d2_q,
+    output wire adc_d3_q,
+    output wire adc_d4_q,
+    output wire hall_1_q,
+    output wire hall_2_q,
+    output wire hall_3_q,
+    output wire enc_A_q,
+    output wire enc_B_q,
+    output wire nfault_q,
+    output wire miso_q,
+    output wire pgd_q
     );
+    
+    // debug outputs
+    assign rst_n_q = rst_n;
+    assign dclk_q = dclk;
+    assign drdy_q = drdy;
+    assign adc_d0_q = adc_d0;
+    assign adc_d1_q = adc_d1;
+    assign adc_d2_q = adc_d2;
+    assign adc_d3_q = adc_d3;
+    assign adc_d4_q = adc_d4;
+    assign hall_1_q = hall_1;
+    assign hall_2_q = hall_2;
+    assign hall_3_q = hall_3;
+    assign enc_A_q = enc_A;
+    assign enc_B_q = enc_B;
+    assign nfault_q = nfault;
+    assign miso_q = miso;
+    assign pgd_q = pgd;
     
     wire mclk;
     wire mmcm1_locked;
@@ -142,8 +183,52 @@ module esc_mvp_top(
     end
     wire rst_ctrl = rst_sync[0]; // active high inside clk_ctrl
     
-    // new code starting here
+    // bus voltage XADC instantiation
     
+    wire xadc_eoc, xadc_drdy;
+    wire [15:0]xadc_do_s;
+    
+    // always read the vp/vn status register (0x03)
+    localparam [6:0]DADDR_VPVN = 7'h03;
+    
+    // one pulse read per conversion
+    // den = DRP enable
+    // for reads, assert den and wait for drdy_out to go high
+    // then do_out is valid
+    wire xadc_den = xadc_eoc;
+    
+    bus_voltage_xadc u_bus_voltage (
+        .daddr_in (DADDR_VPVN),
+        .dclk_in (clk_ctrl),
+        .den_in (xadc_den),
+        .di_in (16'h0000), // never reconfiguring at run time
+        .dwe_in (1'b0), // read-only
+        .reset_in (rst_ctrl),
+        
+        .busy_out (),
+        .channel_out (), // no sequencing
+        
+        // 12 MSBs hold ADC code [15:4]
+        .do_out (xadc_do_s), // output data
+        .drdy_out (xadc_drdy),
+        .eoc_out (xadc_eoc),
+        .eos_out (),
+        .alarm_out (),
+        
+        .vp_in (ar_an5_p),
+        .vn_in (ar_an5_n)
+    );
+    
+    // capture the bus signal when drdy asserts
+    reg [15:0] xadc_sample_r;
+    always @(posedge clk_ctrl) begin
+        if (xadc_drdy) xadc_sample_r <= xadc_do_s;
+    end
+    
+    assign bus_voltage = xadc_sample_r[15:4];
+    
+
+    // timing hub
     reg [11:0]pwm_phase;
     reg pwm_ctr_en;
     reg compute_trig;
@@ -168,6 +253,5 @@ module esc_mvp_top(
         .state(timing_state)
     );
     
-    // new code ending here
     
 endmodule
