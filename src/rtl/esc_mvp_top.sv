@@ -235,7 +235,7 @@ module esc_mvp_top(
     reg [2:0]drdy_idx;
     reg timing_fault;
     reg adc_sync_req;
-    reg timing_state;
+    reg [2:0]timing_state;
    
     timing_hub u_timing (
         .clk_ctrl(clk_ctrl),

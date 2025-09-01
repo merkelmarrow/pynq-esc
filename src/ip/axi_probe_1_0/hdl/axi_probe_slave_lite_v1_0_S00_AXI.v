@@ -22,11 +22,12 @@
 		input wire enc_A, enc_B,
 		input wire nfault, pgd,
 		input wire mmcm1_locked, mmcm2_locked,
-		input wire rst_ctrl, timing_state, 
+		input wire rst_ctrl, 
 		input wire pwm_ctr_en, compute_trig, timing_fault, adc_sync_req,
 		input wire [2:0]drdy_idx,
 		input wire [11:0]pwm_phase,
 		input wire [11:0]bus_voltage,
+		input wire [2:0]timing_state,
 		// User ports ends
 		// Do not modify the ports beyond this line
 
@@ -351,8 +352,103 @@
 	          end                                       
 	        end                                         
 	// Implement memory mapped register select and read logic generation
-	  assign S_AXI_RDATA = (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h0) ? slv_reg0 : (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h1) ? slv_reg1 : (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h2) ? slv_reg2 : (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h3) ? slv_reg3 : (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h4) ? slv_reg4 : (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h5) ? slv_reg5 : (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h6) ? slv_reg6 : (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h7) ? slv_reg7 : 0; 
+    assign S_AXI_RDATA = 
+	   (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h0) ? slv_reg0 :
+	   (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h1) ? slv_reg1 : 
+	   (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h2) ? slv_reg2 : 
+	   (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h3) ? slv_reg3 : 
+	   (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h4) ? slv_reg4 : 
+	   (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h5) ? slv_reg5 : 
+	   (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h6) ? slv_reg6 : 
+	   (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h7) ? slv_reg7 : 32'h0; 
+	
+	
 	// Add user logic here
+	// synchronise all the single bit inputs
+	
+	`define SYNC(sig) \
+	   reg sig``_q1, sig``_q2; \
+	   always @(posedge S_AXI_ACLK) begin \
+	       if (!S_AXI_ARESETN) begin sig``_q1 <= 1'b0; sig``_q2 <= 1'b0; end \
+	       else begin sig``_q1 <= sig; sig``_q2 <= sig``_q1; end \
+	   end \
+	   wire sig``_axi = sig``_q2;
+	   
+	 
+    `SYNC(rst_n)
+    `SYNC(dclk)
+    `SYNC(drdy)
+    `SYNC(adc_d0)
+    `SYNC(adc_d1)
+    `SYNC(adc_d2)
+    `SYNC(adc_d3)
+    `SYNC(adc_d4)
+    `SYNC(hall_1)
+    `SYNC(hall_2)
+    `SYNC(hall_3)
+    `SYNC(enc_A)
+    `SYNC(enc_B)
+    `SYNC(nfault)
+    `SYNC(pgd)
+    `SYNC(mmcm1_locked)
+    `SYNC(mmcm2_locked)
+    `SYNC(rst_ctrl)
+    `SYNC(pwm_ctr_en)
+    `SYNC(compute_trig)
+    `SYNC(timing_fault)
+    `SYNC(adc_sync_req)
+    
+    // synchronise all the multi-bit inputs
+    
+    reg [2:0]drdy_idx_q1, drdy_idx_q2, timing_state_q1, timing_state_q2;
+    reg [11:0]pwm_phase_q1, pwm_phase_q2, bus_voltage_q1, bus_voltage_q2;
+    
+    always @(posedge S_AXI_ACLK) begin
+        if (!S_AXI_ARESETN) begin
+            drdy_idx_q1 <= 0; drdy_idx_q2 <= 0;
+            timing_state_q1 <= 0; timing_state_q2 <= 0;
+            pwm_phase_q1 <= 0; pwm_phase_q2 <= 0;
+            bus_voltage_q1 <= 0; bus_voltage_q2 <= 0;
+        end else begin
+            drdy_idx_q1 <= drdy_idx; drdy_idx_q2 <= drdy_idx_q1;
+            timing_state_q1 <= timing_state; timing_state_q2 <= timing_state_q1;
+            pwm_phase_q1 <= pwm_phase; pwm_phase_q2 <= pwm_phase_q1;
+            bus_voltage_q1 <= bus_voltage; bus_voltage_q2 <= bus_voltage_q1;
+        end
+    end
+    
+    // packing the bits into words
+    wire [15:0]live0 = {
+        1'b0, // 15, reserved
+        pgd_axi, // 14
+        nfault_axi, // 13
+        enc_B_axi, // 12
+        enc_A_axi, // 11
+        hall_3_axi, // 10
+        hall_2_axi, // 9
+        hall_1_axi, // 8
+        adc_d4_axi, // 7
+        adc_d3_axi, // 6
+        adc_d2_axi, // 5
+        adc_d1_axi, // 4
+        adc_d0_axi, // 3
+        drdy_axi, // 2
+        dclk_axi, // 1
+        rst_n_axi // 0
+    };
+    
+    wire [15:0]live1 = {
+        3'b000, // 15:13, reserved
+        drdy_idx_q2, // 12:10
+        timing_state_q2, // 9:7
+        adc_sync_req_axi, // 6
+        compute_trig_axi, // 5
+        pwm_ctr_en_axi, // 4
+        timing_fault_axi, // 3
+        rst_ctrl_axi, // 2
+        mmcm2_locked_axi, // 1
+        mmcm1_locked_axi // 0
+    };
 
 	// User logic ends
 

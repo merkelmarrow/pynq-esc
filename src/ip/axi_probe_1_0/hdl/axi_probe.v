@@ -22,11 +22,12 @@
 		input wire enc_A, enc_B,
 		input wire nfault, pgd,
 		input wire mmcm1_locked, mmcm2_locked,
-		input wire rst_ctrl, timing_state, 
+		input wire rst_ctrl, 
 		input wire pwm_ctr_en, compute_trig, timing_fault, adc_sync_req,
 		input wire [2:0]drdy_idx,
 		input wire [11:0]pwm_phase,
 		input wire [11:0]bus_voltage,
+		input wire [2:0]timing_state,
 		// User ports ends
 		// Do not modify the ports beyond this line
 
