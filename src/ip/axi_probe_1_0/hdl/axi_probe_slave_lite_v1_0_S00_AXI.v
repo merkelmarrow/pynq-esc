@@ -220,11 +220,12 @@
 	begin
 	  if ( S_AXI_ARESETN == 1'b0 )
 	    begin
-	      slv_reg0 <= 0;
-	      slv_reg1 <= 0;
-	      slv_reg2 <= 0;
-	      slv_reg3 <= 0;
-	      slv_reg4 <= 0;
+	      // hardware-write registers
+	      //slv_reg0 <= 0;
+	      //slv_reg1 <= 0;
+	      //slv_reg2 <= 0;
+	      //slv_reg3 <= 0;
+	      //slv_reg4 <= 0;
 	      slv_reg5 <= 0;
 	      slv_reg6 <= 0;
 	      slv_reg7 <= 0;
@@ -234,40 +235,40 @@
 	      begin
 	        case ( (S_AXI_AWVALID) ? S_AXI_AWADDR[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] : axi_awaddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] )
 	          3'h0:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
-	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
-	                // Respective byte enables are asserted as per write strobes 
-	                // Slave register 0
-	                slv_reg0[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
-	              end  
+	            //for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	              //if ( S_AXI_WSTRB[byte_index] == 1 ) begin
+	                //// Respective byte enables are asserted as per write strobes 
+	                //// Slave register 0
+	                //slv_reg0[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
+	              //end  
 	          3'h1:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
-	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
-	                // Respective byte enables are asserted as per write strobes 
-	                // Slave register 1
-	                slv_reg1[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
-	              end  
+	            //for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	              //if ( S_AXI_WSTRB[byte_index] == 1 ) begin
+	                //// Respective byte enables are asserted as per write strobes 
+	                //// Slave register 1
+	                //slv_reg1[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
+	              //end  
 	          3'h2:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
-	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
-	                // Respective byte enables are asserted as per write strobes 
-	                // Slave register 2
-	                slv_reg2[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
-	              end  
+	            //for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	              //if ( S_AXI_WSTRB[byte_index] == 1 ) begin
+	                //// Respective byte enables are asserted as per write strobes 
+	                //// Slave register 2
+	                //slv_reg2[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
+	              //end  
 	          3'h3:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
-	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
-	                // Respective byte enables are asserted as per write strobes 
-	                // Slave register 3
-	                slv_reg3[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
-	              end  
+	            //for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	              //if ( S_AXI_WSTRB[byte_index] == 1 ) begin
+	                //// Respective byte enables are asserted as per write strobes 
+	                //// Slave register 3
+	                //slv_reg3[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
+	              //end  
 	          3'h4:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
-	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
-	                // Respective byte enables are asserted as per write strobes 
-	                // Slave register 4
-	                slv_reg4[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
-	              end  
+	            //for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	              //if ( S_AXI_WSTRB[byte_index] == 1 ) begin
+	                //// Respective byte enables are asserted as per write strobes 
+	                //// Slave register 4
+	                //slv_reg4[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
+	              //end  
 	          3'h5:
 	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
@@ -290,11 +291,11 @@
 	                slv_reg7[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              end  
 	          default : begin
-	                      slv_reg0 <= slv_reg0;
-	                      slv_reg1 <= slv_reg1;
-	                      slv_reg2 <= slv_reg2;
-	                      slv_reg3 <= slv_reg3;
-	                      slv_reg4 <= slv_reg4;
+	                      //slv_reg0 <= slv_reg0;
+	                      //slv_reg1 <= slv_reg1;
+	                      //slv_reg2 <= slv_reg2;
+	                      //slv_reg3 <= slv_reg3;
+	                      //slv_reg4 <= slv_reg4;
 	                      slv_reg5 <= slv_reg5;
 	                      slv_reg6 <= slv_reg6;
 	                      slv_reg7 <= slv_reg7;
@@ -449,6 +450,23 @@
         mmcm2_locked_axi, // 1
         mmcm1_locked_axi // 0
     };
+    
+    always @(posedge S_AXI_ACLK) begin
+        if (!S_AXI_ARESETN) begin
+            slv_reg0 <= 32'h0;
+            slv_reg1 <= 32'h0;
+            slv_reg2 <= 32'h0;
+            slv_reg3 <= 32'h0;
+            slv_reg4 <= 32'h0;
+        end else begin
+            slv_reg0 <= 32'habcd_abcd; // sanity check on software side
+            slv_reg1 <= {16'b0, live0};
+            slv_reg2 <= {16'b0, live1};
+            slv_reg3 <= {20'b0, bus_voltage_q2};
+            slv_reg4 <= {20'b0, pwm_phase_q2};
+        end
+    end
+    
 
 	// User logic ends
 
