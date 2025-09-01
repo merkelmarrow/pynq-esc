@@ -234,35 +234,35 @@
 	    if (S_AXI_WVALID)
 	      begin
 	        case ( (S_AXI_AWVALID) ? S_AXI_AWADDR[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] : axi_awaddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] )
-	          3'h0:
+	          3'h0:;
 	            //for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              //if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                //// Respective byte enables are asserted as per write strobes 
 	                //// Slave register 0
 	                //slv_reg0[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              //end  
-	          3'h1:
+	          3'h1:;
 	            //for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              //if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                //// Respective byte enables are asserted as per write strobes 
 	                //// Slave register 1
 	                //slv_reg1[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              //end  
-	          3'h2:
+	          3'h2:;
 	            //for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              //if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                //// Respective byte enables are asserted as per write strobes 
 	                //// Slave register 2
 	                //slv_reg2[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              //end  
-	          3'h3:
+	          3'h3:;
 	            //for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              //if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                //// Respective byte enables are asserted as per write strobes 
 	                //// Slave register 3
 	                //slv_reg3[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              //end  
-	          3'h4:
+	          3'h4:;
 	            //for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              //if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                //// Respective byte enables are asserted as per write strobes 
