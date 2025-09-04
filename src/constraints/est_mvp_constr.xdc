@@ -41,12 +41,14 @@ set_property -dict { PACKAGE_PIN W19   IOSTANDARD LVCMOS33 } [get_ports { adc_mc
 set_property -dict { PACKAGE_PIN M20   IOSTANDARD LVCMOS33 } [get_ports { rst_n }];
 #IO_L7N_T1_AD2N_35 Sch=sw[0]
 
-## Single ended analog input
+## Single Ended Analog Inputs
+##NOTE: The ar_an_p pins can be used as single ended analog inputs with voltages from 0-3.3V (Arduino Analog pins a[0]-a[5]). 
+##      These signals should only be connected to the XADC core. When using these pins as digital I/O, use pins a[0]-a[5].
 
-set_property -dict { PACKAGE_PIN G19   IOSTANDARD LVCMOS33 } [get_ports { ar_an5_p }];
+set_property -dict { PACKAGE_PIN G19 } [get_ports { ar_an5_p }];
 #IO_L18P_T2_AD13P_35 Sch=ar_an5_p
 
-set_property -dict { PACKAGE_PIN G20   IOSTANDARD LVCMOS33 } [get_ports { ar_an5_n }];
+set_property -dict { PACKAGE_PIN G20 } [get_ports { ar_an5_n }];
 #IO_L18P_T2_AD13P_35 Sch=ar_an5_n
 
 ##Arduino Digital I/O 

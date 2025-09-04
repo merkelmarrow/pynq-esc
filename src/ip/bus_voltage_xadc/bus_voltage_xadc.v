@@ -58,6 +58,8 @@ module bus_voltage_xadc
           di_in,               // Input data bus for the dynamic reconfiguration port
           dwe_in,              // Write Enable for the dynamic reconfiguration port
           reset_in,            // Reset signal for the System Monitor control logic
+          vauxp13,             // Auxiliary channel 13
+          vauxn13,
           busy_out,            // ADC Busy signal
           channel_out,         // Channel Selection Outputs
           do_out,              // Output data bus for dynamic reconfiguration port
@@ -65,6 +67,7 @@ module bus_voltage_xadc
           eoc_out,             // End of Conversion Signal
           eos_out,             // End of Sequence Signal
           alarm_out,           // OR'ed output of all the Alarms    
+          muxaddr_out,
           vp_in,               // Dedicated Analog Input Pair
           vn_in);
 
@@ -74,6 +77,8 @@ module bus_voltage_xadc
           input [15:0] di_in;
           input dwe_in;
           input reset_in;
+          input vauxp13;
+          input vauxn13;
           input vp_in;
           input vn_in;
 
@@ -84,6 +89,7 @@ module bus_voltage_xadc
           output eoc_out;
           output eos_out;
           output alarm_out;
+          output [4:0] muxaddr_out;
 
         wire FLOAT_VCCAUX;
         wire FLOAT_VCCINT;
@@ -135,8 +141,8 @@ module bus_voltage_xadc
           assign aux_channel_p[12] = 1'b0;
           assign aux_channel_n[12] = 1'b0;
 
-          assign aux_channel_p[13] = 1'b0;
-          assign aux_channel_n[13] = 1'b0;
+          assign aux_channel_p[13] = vauxp13;
+          assign aux_channel_n[13] = vauxn13;
 
           assign aux_channel_p[14] = 1'b0;
           assign aux_channel_n[14] = 1'b0;
@@ -144,7 +150,7 @@ module bus_voltage_xadc
           assign aux_channel_p[15] = 1'b0;
           assign aux_channel_n[15] = 1'b0;
 XADC #(
-        .INIT_40(16'h1000), // config reg 0
+        .INIT_40(16'h181D), // config reg 0
         .INIT_41(16'h31AF), // config reg 1
         .INIT_42(16'h0600), // config reg 2
         .INIT_48(16'h0100), // Sequencer channel selection
@@ -197,7 +203,7 @@ inst (
         .JTAGLOCKED(),
         .JTAGMODIFIED(),
         .OT(),
-        .MUXADDR(),
+        .MUXADDR(muxaddr_out),
         .VP(vp_in),
         .VN(vn_in)
           );

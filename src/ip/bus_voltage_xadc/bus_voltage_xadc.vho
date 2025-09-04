@@ -63,7 +63,10 @@ COMPONENT bus_voltage_xadc
     reset_in : IN STD_LOGIC;
     vp_in : IN STD_LOGIC;
     vn_in : IN STD_LOGIC;
+    vauxp13 : IN STD_LOGIC;
+    vauxn13 : IN STD_LOGIC;
     channel_out : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
+    muxaddr_out : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
     eoc_out : OUT STD_LOGIC;
     alarm_out : OUT STD_LOGIC;
     eos_out : OUT STD_LOGIC;
@@ -88,7 +91,10 @@ your_instance_name : bus_voltage_xadc
     reset_in => reset_in,
     vp_in => vp_in,
     vn_in => vn_in,
+    vauxp13 => vauxp13,
+    vauxn13 => vauxn13,
     channel_out => channel_out,
+    muxaddr_out => muxaddr_out,
     eoc_out => eoc_out,
     alarm_out => alarm_out,
     eos_out => eos_out,
