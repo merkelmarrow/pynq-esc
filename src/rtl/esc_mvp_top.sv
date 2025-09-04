@@ -97,7 +97,19 @@ module esc_mvp_top(
     output wire enc_B_q,
     output wire nfault_q,
     output wire miso_q,
-    output wire pgd_q
+    output wire pgd_q,
+    
+    // debug
+    output wire mmcm1_locked_q,
+    output wire mmcm2_locked_q,
+    output wire rst_ctrl_q,
+    output wire pwm_ctr_en_q,
+    output wire compute_trig_q,
+    output wire timing_fault_q,
+    output wire adc_sync_req_q,
+    output wire [2:0]drdy_idx_q,
+    output wire [11:0]pwm_phase_q,
+    output wire [2:0]timing_state_q
     );
     
     // debug outputs
@@ -232,13 +244,13 @@ module esc_mvp_top(
     
 
     // timing hub
-    reg [11:0]pwm_phase;
-    reg pwm_ctr_en;
-    reg compute_trig;
-    reg [2:0]drdy_idx;
-    reg timing_fault;
-    reg adc_sync_req;
-    reg [2:0]timing_state;
+    wire [11:0]pwm_phase;
+    wire pwm_ctr_en;
+    wire compute_trig;
+    wire [2:0]drdy_idx;
+    wire timing_fault;
+    wire adc_sync_req;
+    wire [2:0]timing_state;
    
     timing_hub u_timing (
         .clk_ctrl(clk_ctrl),
@@ -256,5 +268,15 @@ module esc_mvp_top(
         .state(timing_state)
     );
     
+    assign mmcm1_locked_q = mmcm1_locked;
+    assign mmcm2_locked_q = mmcm2_locked;
+    assign rst_ctrl_q = rst_ctrl;
+    assign pwm_ctr_en_q = pwm_ctr_en;
+    assign compute_trig_q = compute_trig;
+    assign timing_fault_q = timing_fault;
+    assign adc_sync_req_q = adc_sync_req;
+    assign drdy_idx_q = drdy_idx;
+    assign pwm_phase_q = pwm_phase;
+    assign timing_state_q = timing_state;
     
 endmodule

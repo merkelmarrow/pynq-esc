@@ -1,0 +1,127 @@
+{
+  "schema": "xilinx.com:schema:json_instance:1.0",
+  "ip_inst": {
+    "xci_name": "esc_bd_esc_mvp_top_0_1",
+    "cell_name": "esc_mvp_top_0",
+    "component_reference": "xilinx.com:module_ref:esc_mvp_top:1.0",
+    "ip_revision": "1",
+    "gen_directory": "../../../../../../esc_mvp.gen/sources_1/bd/esc_bd/ip/esc_bd_esc_mvp_top_0_1",
+    "parameters": {
+      "component_parameters": {
+        "Component_Name": [ { "value": "esc_bd_esc_mvp_top_0_1", "resolve_type": "user", "usage": "all" } ]
+      },
+      "project_parameters": {
+        "ARCHITECTURE": [ { "value": "zynq" } ],
+        "BASE_BOARD_PART": [ { "value": "tul.com.tw:pynq-z2:part0:1.0" } ],
+        "BOARD_CONNECTIONS": [ { "value": "" } ],
+        "DEVICE": [ { "value": "xc7z020" } ],
+        "PACKAGE": [ { "value": "clg400" } ],
+        "PREFHDL": [ { "value": "VERILOG" } ],
+        "SILICON_REVISION": [ { "value": "" } ],
+        "SIMULATOR_LANGUAGE": [ { "value": "MIXED" } ],
+        "SPEEDGRADE": [ { "value": "-1" } ],
+        "STATIC_POWER": [ { "value": "" } ],
+        "TEMPERATURE_GRADE": [ { "value": "" } ]
+      },
+      "runtime_parameters": {
+        "IPCONTEXT": [ { "value": "IP_Integrator" } ],
+        "IPREVISION": [ { "value": "1" } ],
+        "MANAGED": [ { "value": "TRUE" } ],
+        "OUTPUTDIR": [ { "value": "../../../../../../esc_mvp.gen/sources_1/bd/esc_bd/ip/esc_bd_esc_mvp_top_0_1" } ],
+        "SELECTEDSIMMODEL": [ { "value": "" } ],
+        "SHAREDDIR": [ { "value": "../../ipshared" } ],
+        "SWVERSION": [ { "value": "2024.2" } ],
+        "SYNTHESISFLOW": [ { "value": "GLOBAL" } ]
+      }
+    },
+    "boundary": {
+      "ports": {
+        "clk_125_in": [ { "direction": "in" } ],
+        "rst_n": [ { "direction": "in" } ],
+        "dclk": [ { "direction": "in" } ],
+        "drdy": [ { "direction": "in" } ],
+        "adc_d0": [ { "direction": "in" } ],
+        "adc_d1": [ { "direction": "in" } ],
+        "adc_d2": [ { "direction": "in" } ],
+        "adc_d3": [ { "direction": "in" } ],
+        "adc_d4": [ { "direction": "in" } ],
+        "ar_an5_p": [ { "direction": "in" } ],
+        "ar_an5_n": [ { "direction": "in" } ],
+        "hall_1": [ { "direction": "in" } ],
+        "hall_2": [ { "direction": "in" } ],
+        "hall_3": [ { "direction": "in" } ],
+        "enc_A": [ { "direction": "in" } ],
+        "enc_B": [ { "direction": "in" } ],
+        "nfault": [ { "direction": "in" } ],
+        "miso": [ { "direction": "in" } ],
+        "pgd": [ { "direction": "in" } ],
+        "sclk": [ { "direction": "out" } ],
+        "mosi": [ { "direction": "out" } ],
+        "drv_cs_n": [ { "direction": "out" } ],
+        "adc_cs_n": [ { "direction": "out" } ],
+        "inlc": [ { "direction": "out" } ],
+        "inhc": [ { "direction": "out" } ],
+        "inlb": [ { "direction": "out" } ],
+        "inhb": [ { "direction": "out" } ],
+        "inla": [ { "direction": "out" } ],
+        "inha": [ { "direction": "out" } ],
+        "drv_en": [ { "direction": "out" } ],
+        "adc_mclk_out": [ { "direction": "out" } ],
+        "adc_rst_n": [ { "direction": "out" } ],
+        "bus_voltage": [ { "direction": "out", "size_left": "11", "size_right": "0" } ],
+        "rst_n_q": [ { "direction": "out" } ],
+        "dclk_q": [ { "direction": "out" } ],
+        "drdy_q": [ { "direction": "out" } ],
+        "adc_d0_q": [ { "direction": "out" } ],
+        "adc_d1_q": [ { "direction": "out" } ],
+        "adc_d2_q": [ { "direction": "out" } ],
+        "adc_d3_q": [ { "direction": "out" } ],
+        "adc_d4_q": [ { "direction": "out" } ],
+        "hall_1_q": [ { "direction": "out" } ],
+        "hall_2_q": [ { "direction": "out" } ],
+        "hall_3_q": [ { "direction": "out" } ],
+        "enc_A_q": [ { "direction": "out" } ],
+        "enc_B_q": [ { "direction": "out" } ],
+        "nfault_q": [ { "direction": "out" } ],
+        "miso_q": [ { "direction": "out" } ],
+        "pgd_q": [ { "direction": "out" } ],
+        "mmcm1_locked_q": [ { "direction": "out" } ],
+        "mmcm2_locked_q": [ { "direction": "out" } ],
+        "rst_ctrl_q": [ { "direction": "out" } ],
+        "pwm_ctr_en_q": [ { "direction": "out" } ],
+        "compute_trig_q": [ { "direction": "out" } ],
+        "timing_fault_q": [ { "direction": "out" } ],
+        "adc_sync_req_q": [ { "direction": "out" } ],
+        "drdy_idx_q": [ { "direction": "out", "size_left": "2", "size_right": "0" } ],
+        "pwm_phase_q": [ { "direction": "out", "size_left": "11", "size_right": "0" } ],
+        "timing_state_q": [ { "direction": "out", "size_left": "2", "size_right": "0" } ]
+      },
+      "interfaces": {
+        "adc_rst_n": {
+          "vlnv": "xilinx.com:signal:reset:1.0",
+          "abstraction_type": "xilinx.com:signal:reset_rtl:1.0",
+          "mode": "master",
+          "parameters": {
+            "POLARITY": [ { "value": "ACTIVE_LOW", "value_src": "constant", "value_permission": "bd_and_user", "usage": "all" } ],
+            "INSERT_VIP": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "simulation.rtl", "is_ips_inferred": true, "is_static_object": false } ]
+          },
+          "port_maps": {
+            "RST": [ { "physical_name": "adc_rst_n" } ]
+          }
+        },
+        "rst_n": {
+          "vlnv": "xilinx.com:signal:reset:1.0",
+          "abstraction_type": "xilinx.com:signal:reset_rtl:1.0",
+          "mode": "slave",
+          "parameters": {
+            "POLARITY": [ { "value": "ACTIVE_LOW", "value_src": "constant", "value_permission": "bd_and_user", "usage": "all" } ],
+            "INSERT_VIP": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "simulation.rtl", "is_ips_inferred": true, "is_static_object": false } ]
+          },
+          "port_maps": {
+            "RST": [ { "physical_name": "rst_n" } ]
+          }
+        }
+      }
+    }
+  }
+}
