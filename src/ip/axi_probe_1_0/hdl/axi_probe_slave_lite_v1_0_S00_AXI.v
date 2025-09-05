@@ -402,22 +402,27 @@
     
     // synchronise all the multi-bit inputs
     
-    reg [2:0]drdy_idx_q1, drdy_idx_q2, timing_state_q1, timing_state_q2;
-    reg [11:0]pwm_phase_q1, pwm_phase_q2, bus_voltage_q1, bus_voltage_q2;
-    
-    always @(posedge S_AXI_ACLK) begin
-        if (!S_AXI_ARESETN) begin
-            drdy_idx_q1 <= 0; drdy_idx_q2 <= 0;
-            timing_state_q1 <= 0; timing_state_q2 <= 0;
-            pwm_phase_q1 <= 0; pwm_phase_q2 <= 0;
-            bus_voltage_q1 <= 0; bus_voltage_q2 <= 0;
-        end else begin
-            drdy_idx_q1 <= drdy_idx; drdy_idx_q2 <= drdy_idx_q1;
-            timing_state_q1 <= timing_state; timing_state_q2 <= timing_state_q1;
-            pwm_phase_q1 <= pwm_phase; pwm_phase_q2 <= pwm_phase_q1;
-            bus_voltage_q1 <= bus_voltage; bus_voltage_q2 <= bus_voltage_q1;
-        end
-    end
+    `define SYNC_BUS(sig, W) \
+        (* ASYNC_REG = "TRUE" *) reg [W-1:0]sig``_q1; \
+        (* ASYNC_REG = "TRUE" *) reg [W-1:0]sig``_q2; \
+        reg [W-1:0]sig``_sync; \
+        always @(posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin \
+            if (!S_AXI_ARESETN) begin \
+                sig``_q1 <= {W{1'b0}}; \
+                sig``_q2 <= {W{1'b0}}; \
+                sig``_sync <= {W{1'b0}}; \
+            end else begin \
+                sig``_q1 <= sig; \
+                sig``_q2 <= sig``_q1; \
+                if (sig``_q1 == sig``_q2) sig``_sync <= sig``_q2; \
+            end \
+        end \
+        wire [W-1:0]sig``_axi = sig``_sync;
+        
+    `SYNC_BUS(drdy_idx, 3)
+    `SYNC_BUS(timing_state, 3)
+    `SYNC_BUS(pwm_phase, 12)
+    `SYNC_BUS(bus_voltage, 12)
     
     // packing the bits into words
     wire [15:0]live0 = {
@@ -441,8 +446,8 @@
     
     wire [15:0]live1 = {
         3'b000, // 15:13, reserved
-        drdy_idx_q2, // 12:10
-        timing_state_q2, // 9:7
+        drdy_idx_axi, // 12:10
+        timing_state_axi, // 9:7
         adc_sync_req_axi, // 6
         compute_trig_axi, // 5
         pwm_ctr_en_axi, // 4
@@ -463,8 +468,8 @@
             slv_reg0 <= 32'habcd_abcd; // sanity check on software side
             slv_reg1 <= {16'b0, live0};
             slv_reg2 <= {16'b0, live1};
-            slv_reg3 <= {20'b0, bus_voltage_q2};
-            slv_reg4 <= {20'b0, pwm_phase_q2};
+            slv_reg3 <= {20'b0, bus_voltage_axi};
+            slv_reg4 <= {20'b0, pwm_phase_axi};
         end
     end
     

@@ -4,7 +4,7 @@
     "xci_name": "esc_bd_axi_probe_0_4",
     "cell_name": "axi_probe_0",
     "component_reference": "xilinx.com:user:axi_probe:1.0",
-    "ip_revision": "3",
+    "ip_revision": "4",
     "gen_directory": "../../../../../../esc_mvp.gen/sources_1/bd/esc_bd/ip/esc_bd_axi_probe_0_4",
     "parameters": {
       "component_parameters": {
@@ -33,7 +33,7 @@
       },
       "runtime_parameters": {
         "IPCONTEXT": [ { "value": "IP_Integrator" } ],
-        "IPREVISION": [ { "value": "3" } ],
+        "IPREVISION": [ { "value": "4" } ],
         "MANAGED": [ { "value": "TRUE" } ],
         "OUTPUTDIR": [ { "value": "../../../../../../esc_mvp.gen/sources_1/bd/esc_bd/ip/esc_bd_axi_probe_0_4" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],
