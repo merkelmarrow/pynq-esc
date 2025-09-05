@@ -5,122 +5,131 @@
 
 ## Clock signal 125 MHz
 
-set_property -dict { PACKAGE_PIN H16   IOSTANDARD LVCMOS33 } [get_ports { clk_125_in }]; 
+set_property -dict { PACKAGE_PIN H16   IOSTANDARD LVCMOS33 } [get_ports { clk_125_in_0 }]; 
 #IO_L13P_T2_MRCC_35 Sch=sysclk
-# create_clock -add -name clk_125_in -period 8.00 -waveform {0 4} [get_ports { clk_125_in }];
+## clk_125_in commented out as already constrained in MMCM1 IP
+## avoiding overwrite
+#create_clock -name clk_125_in -period 8.00 -waveform {0 4} [get_ports { clk_125_in_0 }];
+create_clock -name dclk -period 30.518 -waveform {0 15.259} [get_ports dclk_0]
+
+set_clock_groups -asynchronous \
+    -group [get_clocks {clk_fpga_0}] \
+    -group [get_clocks {dclk}] \
+    -group [get_clocks -of_objects [get_pins esc_bd_i/esc_mvp_top_0/inst/u_mmcm_stage1/inst/mmcm_adv_inst/CLKOUT0]] \
+    -group [get_clocks -of_objects [get_pins esc_bd_i/esc_mvp_top_0/inst/u_mmcm_stage2/inst/mmcm_adv_inst/CLKOUT0]]
 
 ## Pmod A
 
-set_property -dict { PACKAGE_PIN Y18   IOSTANDARD LVCMOS33 } [get_ports { adc_d4 }]; 
+set_property -dict { PACKAGE_PIN Y18   IOSTANDARD LVCMOS33 } [get_ports { adc_d4_0 }]; 
 #IO_L17P_T2_34 Sch=ja_p[1]
 
-set_property -dict { PACKAGE_PIN U18   IOSTANDARD LVCMOS33 } [get_ports { adc_d3 }]; 
+set_property -dict { PACKAGE_PIN U18   IOSTANDARD LVCMOS33 } [get_ports { dclk_0 }]; 
 #IO_L12P_T1_MRCC_34 Sch=ja_p[3]
 
-set_property -dict { PACKAGE_PIN Y19   IOSTANDARD LVCMOS33 } [get_ports { adc_d2 }]; 
+set_property -dict { PACKAGE_PIN Y19   IOSTANDARD LVCMOS33 } [get_ports { adc_d2_0 }]; 
 #IO_L17N_T2_34 Sch=ja_n[1]
 
-set_property -dict { PACKAGE_PIN U19   IOSTANDARD LVCMOS33 } [get_ports { adc_d1 }];
+set_property -dict { PACKAGE_PIN U19   IOSTANDARD LVCMOS33 } [get_ports { adc_d1_0 }];
 #IO_L12N_T1_MRCC_34 Sch=ja_n[3]
 
-set_property -dict { PACKAGE_PIN Y16   IOSTANDARD LVCMOS33 } [get_ports { adc_d0 }]; 
+set_property -dict { PACKAGE_PIN Y16   IOSTANDARD LVCMOS33 } [get_ports { adc_d0_0 }]; 
 #IO_L7P_T1_34 Sch=ja_p[2]
 
-set_property -dict { PACKAGE_PIN W18   IOSTANDARD LVCMOS33 } [get_ports { dclk }];
+set_property -dict { PACKAGE_PIN W18   IOSTANDARD LVCMOS33 } [get_ports { adc_d3_0 }];
 #IO_L22P_T3_34 Sch=ja_p[4]
 
-set_property -dict { PACKAGE_PIN Y17   IOSTANDARD LVCMOS33 } [get_ports { drdy }];
+set_property -dict { PACKAGE_PIN Y17   IOSTANDARD LVCMOS33 } [get_ports { drdy_0 }];
 #IO_L7N_T1_34 Sch=ja_n[2]
 
-set_property -dict { PACKAGE_PIN W19   IOSTANDARD LVCMOS33 } [get_ports { adc_mclk_out }];
+set_property -dict { PACKAGE_PIN W19   IOSTANDARD LVCMOS33 } [get_ports { adc_mclk_out_0 }];
 #IO_L22N_T3_34 Sch=ja_n[4]
 
 
 ## Switch
 
-set_property -dict { PACKAGE_PIN M20   IOSTANDARD LVCMOS33 } [get_ports { rst_n }];
+#set_property -dict { PACKAGE_PIN M20   IOSTANDARD LVCMOS33 } [get_ports { rst_n }];
 #IO_L7N_T1_AD2N_35 Sch=sw[0]
 
 ## Single Ended Analog Inputs
 ##NOTE: The ar_an_p pins can be used as single ended analog inputs with voltages from 0-3.3V (Arduino Analog pins a[0]-a[5]). 
 ##      These signals should only be connected to the XADC core. When using these pins as digital I/O, use pins a[0]-a[5].
 
-set_property -dict { PACKAGE_PIN G19 } [get_ports { ar_an5_p }];
+set_property -dict { PACKAGE_PIN G19    IOSTANDARD LVCMOS33} [get_ports { ar_an5_p_0 }];
 #IO_L18P_T2_AD13P_35 Sch=ar_an5_p
 
-set_property -dict { PACKAGE_PIN G20 } [get_ports { ar_an5_n }];
+set_property -dict { PACKAGE_PIN G20    IOSTANDARD LVCMOS33} [get_ports { ar_an5_n_0 }];
 #IO_L18P_T2_AD13P_35 Sch=ar_an5_n
 
 ##Arduino Digital I/O 
 
-set_property -dict { PACKAGE_PIN T14   IOSTANDARD LVCMOS33 } [get_ports { hall_1 }];
+set_property -dict { PACKAGE_PIN T14   IOSTANDARD LVCMOS33 } [get_ports { hall_1_0 }];
 #IO_L5P_T0_34 Sch=ar[0]
 
-set_property -dict { PACKAGE_PIN U12   IOSTANDARD LVCMOS33 } [get_ports { pgd }]; 
+set_property -dict { PACKAGE_PIN U12   IOSTANDARD LVCMOS33 } [get_ports { pgd_0 }]; 
 #IO_L2N_T0_34 Sch=ar[1]
 
-set_property -dict { PACKAGE_PIN U13   IOSTANDARD LVCMOS33 } [get_ports { adc_cs_n }];
+set_property -dict { PACKAGE_PIN U13   IOSTANDARD LVCMOS33 } [get_ports { adc_cs_n_0 }];
 #IO_L3P_T0_DQS_PUDC_B_34 Sch=ar[2]
 
-set_property -dict { PACKAGE_PIN V13   IOSTANDARD LVCMOS33 } [get_ports { hall_2 }];
+set_property -dict { PACKAGE_PIN V13   IOSTANDARD LVCMOS33 } [get_ports { hall_2_0 }];
 #IO_L3N_T0_DQS_34 Sch=ar[3]
 
-set_property -dict { PACKAGE_PIN V15   IOSTANDARD LVCMOS33 } [get_ports { hall_3 }];
+set_property -dict { PACKAGE_PIN V15   IOSTANDARD LVCMOS33 } [get_ports { hall_3_0 }];
 #IO_L10P_T1_34 Sch=ar[4]
 
 #set_property -dict { PACKAGE_PIN T15   IOSTANDARD LVCMOS33 } [get_ports { ar[5] }]; #IO_L5N_T0_34 Sch=ar[5]
 
-set_property -dict { PACKAGE_PIN R16   IOSTANDARD LVCMOS33 } [get_ports { nfault }];
+set_property -dict { PACKAGE_PIN R16   IOSTANDARD LVCMOS33 } [get_ports { nfault_0 }];
 #IO_L19P_T3_34 Sch=ar[6]
 
 #set_property -dict { PACKAGE_PIN U17   IOSTANDARD LVCMOS33 } [get_ports { ar[7] }]; #IO_L9N_T1_DQS_34 Sch=ar[7]
 
-set_property -dict { PACKAGE_PIN V17   IOSTANDARD LVCMOS33 } [get_ports { adc_rst_n }];
+set_property -dict { PACKAGE_PIN V17   IOSTANDARD LVCMOS33 } [get_ports { adc_rst_n_0 }];
 #IO_L21P_T3_DQS_34 Sch=ar[8]
 
-set_property -dict { PACKAGE_PIN V18   IOSTANDARD LVCMOS33 } [get_ports { drv_cs_n }];
+set_property -dict { PACKAGE_PIN V18   IOSTANDARD LVCMOS33 } [get_ports { drv_cs_n_0 }];
 #IO_L21N_T3_DQS_34 Sch=ar[9]
 
-set_property -dict { PACKAGE_PIN T16   IOSTANDARD LVCMOS33 } [get_ports { drv_en }];
+set_property -dict { PACKAGE_PIN T16   IOSTANDARD LVCMOS33 } [get_ports { drv_en_0 }];
 #IO_L9P_T1_DQS_34 Sch=ar[10]
 
-set_property -dict { PACKAGE_PIN R17   IOSTANDARD LVCMOS33 } [get_ports { inha }];
+set_property -dict { PACKAGE_PIN R17   IOSTANDARD LVCMOS33 } [get_ports { inha_0 }];
 #IO_L19N_T3_VREF_34 Sch=ar[11]
 
-set_property -dict { PACKAGE_PIN P18   IOSTANDARD LVCMOS33 } [get_ports { inla }];
+set_property -dict { PACKAGE_PIN P18   IOSTANDARD LVCMOS33 } [get_ports { inla_0 }];
 #IO_L23N_T3_34 Sch=ar[12]
 
-set_property -dict { PACKAGE_PIN N17   IOSTANDARD LVCMOS33 } [get_ports { inhb }];
+set_property -dict { PACKAGE_PIN N17   IOSTANDARD LVCMOS33 } [get_ports { inhb_0 }];
 #IO_L23P_T3_34 Sch=ar[13]
 
-set_property -dict { PACKAGE_PIN Y13   IOSTANDARD LVCMOS33 } [get_ports { inlb }]; 
+set_property -dict { PACKAGE_PIN Y13   IOSTANDARD LVCMOS33 } [get_ports { inlb_0 }]; 
 #IO_L20N_T3_13 Sch=a
 
 ## Arduino I2C
 
-set_property -dict { PACKAGE_PIN P16   IOSTANDARD LVCMOS33 } [get_ports { inhc }];
+set_property -dict { PACKAGE_PIN P16   IOSTANDARD LVCMOS33 } [get_ports { inhc_0 }];
 #IO_L24N_T3_34 Sch=ar_scl
 
-set_property -dict { PACKAGE_PIN P15   IOSTANDARD LVCMOS33 } [get_ports { inlc }]; 
+set_property -dict { PACKAGE_PIN P15   IOSTANDARD LVCMOS33 } [get_ports { inlc_0 }]; 
 #IO_L24P_T3_34 Sch=ar_sda
 
 ## Pmod B
-set_property -dict { PACKAGE_PIN W14   IOSTANDARD LVCMOS33 } [get_ports { miso }];
+set_property -dict { PACKAGE_PIN W14   IOSTANDARD LVCMOS33 } [get_ports { miso_0 }];
 #IO_L8P_T1_34 Sch=jb_p[1]
 
 ##Arduino Digital I/O On Outer Analog Header
 ##NOTE: These pins should be used when using the analog header signals A0-A5 as digital I/O 
 
-set_property -dict { PACKAGE_PIN Y11   IOSTANDARD LVCMOS33 } [get_ports { mosi }]; 
+set_property -dict { PACKAGE_PIN Y11   IOSTANDARD LVCMOS33 } [get_ports { mosi_0 }]; 
 #IO_L18N_T2_13 Sch=a[0]
 
-set_property -dict { PACKAGE_PIN Y12   IOSTANDARD LVCMOS33 } [get_ports { sclk }];
+set_property -dict { PACKAGE_PIN Y12   IOSTANDARD LVCMOS33 } [get_ports { sclk_0 }];
 #IO_L20P_T3_13 Sch=a[1]
 
-set_property -dict { PACKAGE_PIN W11   IOSTANDARD LVCMOS33 } [get_ports { enc_A }];
+set_property -dict { PACKAGE_PIN W11   IOSTANDARD LVCMOS33 } [get_ports { enc_A_0 }];
 #IO_L18P_T2_13 Sch=a[2]
 
-set_property -dict { PACKAGE_PIN V11   IOSTANDARD LVCMOS33 } [get_ports { enc_B }];
+set_property -dict { PACKAGE_PIN V11   IOSTANDARD LVCMOS33 } [get_ports { enc_B_0 }];
 #IO_L21P_T3_DQS_13 Sch=a[3]
 
 #set_property -dict { PACKAGE_PIN T5    IOSTANDARD LVCMOS33 } [get_ports { a[4] }]; #IO_L19P_T3_13 Sch=a[4]

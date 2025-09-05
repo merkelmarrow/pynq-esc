@@ -368,8 +368,9 @@
 	// synchronise all the single bit inputs
 	
 	`define SYNC(sig) \
-	   reg sig``_q1, sig``_q2; \
-	   always @(posedge S_AXI_ACLK) begin \
+	   (* ASYNC_REG = "TRUE" *) reg sig``_q1; \
+	   (* ASYNC_REG = "TRUE" *) reg sig``_q2; \
+	   always @(posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin \
 	       if (!S_AXI_ARESETN) begin sig``_q1 <= 1'b0; sig``_q2 <= 1'b0; end \
 	       else begin sig``_q1 <= sig; sig``_q2 <= sig``_q1; end \
 	   end \

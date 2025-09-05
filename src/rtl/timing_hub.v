@@ -67,7 +67,7 @@ module timing_hub #(
     // count 24 dclk negedges to complete a frame read
     // emit 2 CDC toggles into clk_ctrl: drdy_seen, frame_done
     
-    (* ASYNC_REG = "true" *) reg [1:0]rst_dclk_sync;
+    (* ASYNC_REG = "TRUE" *) reg [1:0]rst_dclk_sync;
     always @(negedge dclk or posedge rst_ctrl) begin
         if (rst_ctrl) rst_dclk_sync <= 2'b11;
         else rst_dclk_sync <= {1'b0, rst_dclk_sync[1]};
