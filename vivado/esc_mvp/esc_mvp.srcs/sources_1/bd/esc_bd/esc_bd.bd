@@ -350,7 +350,7 @@
             "value": "10.000000"
           },
           "PCW_ACT_SPI_PERIPHERAL_FREQMHZ": {
-            "value": "10.000000"
+            "value": "166.666672"
           },
           "PCW_ACT_TPIU_PERIPHERAL_FREQMHZ": {
             "value": "200.000000"
@@ -575,7 +575,7 @@
             "value": "0"
           },
           "PCW_EN_EMIO_SPI0": {
-            "value": "0"
+            "value": "1"
           },
           "PCW_EN_EMIO_SPI1": {
             "value": "0"
@@ -662,7 +662,7 @@
             "value": "0"
           },
           "PCW_EN_SPI0": {
-            "value": "0"
+            "value": "1"
           },
           "PCW_EN_SPI1": {
             "value": "0"
@@ -1385,7 +1385,7 @@
             "value": "200"
           },
           "PCW_PERIPHERAL_BOARD_PRESET": {
-            "value": "None"
+            "value": "part0"
           },
           "PCW_PLL_BYPASSMODE_ENABLE": {
             "value": "0"
@@ -1499,7 +1499,10 @@
             "value": "0"
           },
           "PCW_SPI0_PERIPHERAL_ENABLE": {
-            "value": "0"
+            "value": "1"
+          },
+          "PCW_SPI0_SPI0_IO": {
+            "value": "EMIO"
           },
           "PCW_SPI1_PERIPHERAL_ENABLE": {
             "value": "0"
@@ -1507,8 +1510,11 @@
           "PCW_SPI_PERIPHERAL_CLKSRC": {
             "value": "IO PLL"
           },
+          "PCW_SPI_PERIPHERAL_FREQMHZ": {
+            "value": "166.666666"
+          },
           "PCW_SPI_PERIPHERAL_VALID": {
-            "value": "0"
+            "value": "1"
           },
           "PCW_TPIU_PERIPHERAL_CLKSRC": {
             "value": "External"
@@ -2150,23 +2156,8 @@
           "nfault": {
             "direction": "I"
           },
-          "miso": {
-            "direction": "I"
-          },
           "pgd": {
             "direction": "I"
-          },
-          "sclk": {
-            "direction": "O"
-          },
-          "mosi": {
-            "direction": "O"
-          },
-          "drv_cs_n": {
-            "direction": "O"
-          },
-          "adc_cs_n": {
-            "direction": "O"
           },
           "inlc": {
             "direction": "O"
@@ -2393,12 +2384,6 @@
           "esc_mvp_top_0/enc_B"
         ]
       },
-      "esc_mvp_top_0_adc_cs_n": {
-        "ports": [
-          "esc_mvp_top_0/adc_cs_n",
-          "adc_cs_n_0"
-        ]
-      },
       "esc_mvp_top_0_adc_d0_q": {
         "ports": [
           "esc_mvp_top_0/adc_d0_q",
@@ -2475,12 +2460,6 @@
         "ports": [
           "esc_mvp_top_0/drdy_q",
           "axi_probe_0/drdy"
-        ]
-      },
-      "esc_mvp_top_0_drv_cs_n": {
-        "ports": [
-          "esc_mvp_top_0/drv_cs_n",
-          "drv_cs_n_0"
         ]
       },
       "esc_mvp_top_0_drv_en": {
@@ -2567,12 +2546,6 @@
           "axi_probe_0/mmcm2_locked"
         ]
       },
-      "esc_mvp_top_0_mosi": {
-        "ports": [
-          "esc_mvp_top_0/mosi",
-          "mosi_0"
-        ]
-      },
       "esc_mvp_top_0_nfault_q": {
         "ports": [
           "esc_mvp_top_0/nfault_q",
@@ -2609,12 +2582,6 @@
           "axi_probe_0/rst_n"
         ]
       },
-      "esc_mvp_top_0_sclk": {
-        "ports": [
-          "esc_mvp_top_0/sclk",
-          "sclk_0"
-        ]
-      },
       "esc_mvp_top_0_timing_fault_q": {
         "ports": [
           "esc_mvp_top_0/timing_fault_q",
@@ -2648,7 +2615,7 @@
       "miso_0_1": {
         "ports": [
           "miso_0",
-          "esc_mvp_top_0/miso"
+          "processing_system7_0/SPI0_MISO_I"
         ]
       },
       "nfault_0_1": {
@@ -2676,8 +2643,32 @@
         "ports": [
           "processing_system7_0/FCLK_RESET0_N",
           "rst_ps7_0_100M/ext_reset_in",
-          "esc_mvp_top_0/rst_n",
-          "rst_ps7_0_100M/aux_reset_in"
+          "rst_ps7_0_100M/aux_reset_in",
+          "esc_mvp_top_0/rst_n"
+        ]
+      },
+      "processing_system7_0_SPI0_MOSI_O": {
+        "ports": [
+          "processing_system7_0/SPI0_MOSI_O",
+          "mosi_0"
+        ]
+      },
+      "processing_system7_0_SPI0_SCLK_O": {
+        "ports": [
+          "processing_system7_0/SPI0_SCLK_O",
+          "sclk_0"
+        ]
+      },
+      "processing_system7_0_SPI0_SS1_O": {
+        "ports": [
+          "processing_system7_0/SPI0_SS1_O",
+          "drv_cs_n_0"
+        ]
+      },
+      "processing_system7_0_SPI0_SS_O": {
+        "ports": [
+          "processing_system7_0/SPI0_SS_O",
+          "adc_cs_n_0"
         ]
       },
       "rst_ps7_0_100M_peripheral_aresetn": {

@@ -51,19 +51,12 @@ module esc_mvp_top(
     // gate driver
     input wire nfault,
     
-    // SPI
-    input wire miso,
     
     // hot swap controller
     input wire pgd,
     
     // OUTPUTS
-    
-    // SPI
-    output wire sclk,
-    output wire mosi,
-    output wire drv_cs_n,
-    output wire adc_cs_n,
+   
     
     // gate driver
     output wire inlc,
@@ -127,7 +120,6 @@ module esc_mvp_top(
     assign enc_A_q = enc_A;
     assign enc_B_q = enc_B;
     assign nfault_q = nfault;
-    assign miso_q = miso;
     assign pgd_q = pgd;
     
     wire mclk;
