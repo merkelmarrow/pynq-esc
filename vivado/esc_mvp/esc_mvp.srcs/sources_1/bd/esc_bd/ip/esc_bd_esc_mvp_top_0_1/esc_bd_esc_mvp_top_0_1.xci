@@ -53,12 +53,7 @@
         "enc_A": [ { "direction": "in" } ],
         "enc_B": [ { "direction": "in" } ],
         "nfault": [ { "direction": "in" } ],
-        "miso": [ { "direction": "in" } ],
         "pgd": [ { "direction": "in" } ],
-        "sclk": [ { "direction": "out" } ],
-        "mosi": [ { "direction": "out" } ],
-        "drv_cs_n": [ { "direction": "out" } ],
-        "adc_cs_n": [ { "direction": "out" } ],
         "inlc": [ { "direction": "out" } ],
         "inhc": [ { "direction": "out" } ],
         "inlb": [ { "direction": "out" } ],
@@ -94,7 +89,8 @@
         "adc_sync_req_q": [ { "direction": "out" } ],
         "drdy_idx_q": [ { "direction": "out", "size_left": "2", "size_right": "0" } ],
         "pwm_phase_q": [ { "direction": "out", "size_left": "11", "size_right": "0" } ],
-        "timing_state_q": [ { "direction": "out", "size_left": "2", "size_right": "0" } ]
+        "timing_state_q": [ { "direction": "out", "size_left": "2", "size_right": "0" } ],
+        "pos12_q": [ { "direction": "out", "size_left": "11", "size_right": "0" } ]
       },
       "interfaces": {
         "adc_rst_n": {
