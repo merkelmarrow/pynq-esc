@@ -44,12 +44,17 @@ module quad_to_pos_12bit #(
     // cdc, double flip flop sync
     (* ASYNC_REG = "TRUE" *) reg [1:0]a_sync;
     (* ASYNC_REG = "TRUE" *) reg [1:0]b_sync;
-    always @(posedge clk) begin
-        a_sync <= {a_sync[1:0], (a_in ^ INVERT_A)};
-        b_sync <= {b_sync[1:0], (b_in ^ INVERT_B)};
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            a_sync <= 2'b00;
+            b_sync <= 2'b00;
+        end else begin
+            a_sync <= {a_sync[1:0], (a_in ^ INVERT_A)};
+            b_sync <= {b_sync[1:0], (b_in ^ INVERT_B)};
+        end
     end
-    wire a = a_sync[2];
-    wire b = b_sync[2];
+    wire a = a_sync[1];
+    wire b = b_sync[1];
     
     
     reg [1:0]prev;
@@ -60,6 +65,7 @@ module quad_to_pos_12bit #(
     reg [7:0]step_age;
     
     // don't evaluate transitions until prev is seeded
+    reg primed;
     
     // CW/ACW decode
     wire is_cw, is_acw;
@@ -74,4 +80,62 @@ module quad_to_pos_12bit #(
         (prev == 2'b10 && curr == 2'b11) ||
         (prev == 2'b11 && curr == 2'b01) || 
         (prev == 2'b01 && curr == 2'b00);
+        
+    // illegal change
+    wire two_bits_changed = (prev[1]^curr[1]) & (prev[0]^curr[0]);
+    
+    // position updates
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            prev <= 2'b00;
+            curr <= 2'b00;
+            primed <= 1'b0;
+            
+            pos14 <= 14'b0;
+            pos12 <= 12'b0;
+            
+            step_pulse <= 1'b0;
+            dir <= 1'b0;
+            illegal <= 1'b0;
+            
+            step_age <= 8'FF; // long time ago
+        end else begin
+            curr <= {a,b};
+            
+            // defaults
+            step_pulse <= 1'b0;
+            illegal <= 1'b0;
+            if (step_age != 8'hFF) step_age <= step_age + 8'd1;
+            
+            if (zero_req) begin
+                pos14 <= 14'd0;
+                // pos12 updates from pos14
+            end else begin
+                // avoid registering first step until prev is seeded
+                if (!primed) begin
+                    prev <= curr;
+                    primed <= 1'b1;
+                end else if (!same) begin
+                    if (two_bits_changed) begin
+                        illegal <= 1'b1;
+                    end else if ((is_cw | is_acw) &&
+                        (step_age >= MIN_STEP_CYCLES[7:0])) begin
+                        step_pulse <= 1'b1;
+                        dir <= is_cw;
+                        step_age <= 8'd0;
+                        
+                        if (is_cw) begin
+                            pos14 <= (pos14 == MAX14) ? 14'd0 : (pos14 + 14'd1);
+                        end else begin
+                            pos14 <= (pos14 == 14'd0) ? MAX14 : (pos14 - 14'd1);
+                        end
+                    end
+                end
+            end
+            
+            pos12 <= pos14[13:2];
+            prev <= curr;
+        end
+    end
+    
 endmodule
