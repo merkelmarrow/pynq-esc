@@ -28,6 +28,7 @@
 		input wire [11:0]pwm_phase,
 		input wire [11:0]bus_voltage,
 		input wire [2:0]timing_state,
+		input wire [11:0]pos12,
 		// User ports ends
 		// Do not modify the ports beyond this line
 
@@ -423,6 +424,7 @@
     `SYNC_BUS(timing_state, 3)
     `SYNC_BUS(pwm_phase, 12)
     `SYNC_BUS(bus_voltage, 12)
+    `SYNC_BUS(pos12, 12)
     
     // packing the bits into words
     wire [15:0]live0 = {
@@ -469,7 +471,7 @@
             slv_reg1 <= {16'b0, live0};
             slv_reg2 <= {16'b0, live1};
             slv_reg3 <= {20'b0, bus_voltage_axi};
-            slv_reg4 <= {20'b0, pwm_phase_axi};
+            slv_reg4 <= {8'b0, pos12_axi, pwm_phase_axi};
         end
     end
     
