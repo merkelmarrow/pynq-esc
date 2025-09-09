@@ -102,7 +102,8 @@ module esc_mvp_top(
     output wire adc_sync_req_q,
     output wire [2:0]drdy_idx_q,
     output wire [11:0]pwm_phase_q,
-    output wire [2:0]timing_state_q
+    output wire [2:0]timing_state_q,
+    output wire [11:0]pos12_q
     );
     
     // debug outputs
@@ -260,6 +261,24 @@ module esc_mvp_top(
         .state(timing_state)
     );
     
+    reg position_zero_cmd; // one cycle pulse
+    wire [11:0]pos12;
+    wire [13:0]pos14;
+    wire pos_step_pulse, dir, enc_illegal;
+    
+    quad_to_pos_12bit u_pos_decoder (
+        .clk(clk_ctrl),
+        .rst(rst_ctrl),
+        .a_in(enc_A),
+        .b_in(enc_B),
+        .zero_req(position_zero_cmd),
+        .pos12(pos12),
+        .pos14(pos14),
+        .step_pulse(pos_step_pulse),
+        .dir(dir),
+        .illegal(enc_illegal)
+    );
+    
     assign mmcm1_locked_q = mmcm1_locked;
     assign mmcm2_locked_q = mmcm2_locked;
     assign rst_ctrl_q = rst_ctrl;
@@ -270,5 +289,6 @@ module esc_mvp_top(
     assign drdy_idx_q = drdy_idx;
     assign pwm_phase_q = pwm_phase;
     assign timing_state_q = timing_state;
+    assign pos12_q = pos12;
     
 endmodule

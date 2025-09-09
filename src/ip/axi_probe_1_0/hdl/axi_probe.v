@@ -28,6 +28,7 @@
 		input wire [11:0]pwm_phase,
 		input wire [11:0]bus_voltage,
 		input wire [2:0]timing_state,
+		input wire [11:0]pos12,
 		// User ports ends
 		// Do not modify the ports beyond this line
 
@@ -106,7 +107,8 @@
 		.adc_sync_req (adc_sync_req),
 		.drdy_idx (drdy_idx),
 		.pwm_phase (pwm_phase),
-		.bus_voltage (bus_voltage)
+		.bus_voltage (bus_voltage),
+		.pos12 (pos12)
 	);
 
 	// Add user logic here

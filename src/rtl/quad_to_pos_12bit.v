@@ -21,40 +21,33 @@
 
 
 module quad_to_pos_12bit #(
-    parameter integer CPR = 4096,
     parameter INVERT_A = 1'b0, // inversion in case wired wrong
     parameter INVERT_B = 1'b0,
-    parameter integer MIN_STEP_CYCLES = 2
+    parameter integer MIN_STEP_CYCLES = 2 // must be less than 255
     ) (
     input wire clk,
     input wire rst,
     input wire a_in,
     input wire b_in,
     input wire zero_req,
-    // runtime config registers
-    output reg [11:0]pos12,
+    output wire [11:0]pos12,
     output reg [13:0]pos14,
     output reg step_pulse, dir, illegal
     );
     
     // assumes CPR = 4096, STATES -> 16384, 14 bits
-    localparam integer STATES = (4 * CPR);
+    localparam integer STATES = (4 * 4096);
     localparam [13:0]MAX14 = 14'd16383; // STATES - 1
     
     // cdc, double flip flop sync
-    (* ASYNC_REG = "TRUE" *) reg [1:0]a_sync;
-    (* ASYNC_REG = "TRUE" *) reg [1:0]b_sync;
-    always @(posedge clk or posedge rst) begin
-        if (rst) begin
-            a_sync <= 2'b00;
-            b_sync <= 2'b00;
-        end else begin
-            a_sync <= {a_sync[1:0], (a_in ^ INVERT_A)};
-            b_sync <= {b_sync[1:0], (b_in ^ INVERT_B)};
-        end
+    (* ASYNC_REG = "TRUE", SHREG_EXTRACT = "NO" *) reg [2:0]a_sync;
+    (* ASYNC_REG = "TRUE", SHREG_EXTRACT = "NO" *) reg [2:0]b_sync;
+    always @(posedge clk) begin
+        a_sync <= {a_sync[1:0], (a_in ^ INVERT_A)};
+        b_sync <= {b_sync[1:0], (b_in ^ INVERT_B)};
     end
-    wire a = a_sync[1];
-    wire b = b_sync[1];
+    wire a = a_sync[2];
+    wire b = b_sync[2];
     
     
     reg [1:0]prev;
@@ -92,13 +85,12 @@ module quad_to_pos_12bit #(
             primed <= 1'b0;
             
             pos14 <= 14'b0;
-            pos12 <= 12'b0;
             
             step_pulse <= 1'b0;
             dir <= 1'b0;
             illegal <= 1'b0;
             
-            step_age <= 8'FF; // long time ago
+            step_age <= 8'hFF; // long time ago
         end else begin
             curr <= {a,b};
             
@@ -113,13 +105,12 @@ module quad_to_pos_12bit #(
             end else begin
                 // avoid registering first step until prev is seeded
                 if (!primed) begin
-                    prev <= curr;
                     primed <= 1'b1;
                 end else if (!same) begin
                     if (two_bits_changed) begin
                         illegal <= 1'b1;
-                    end else if ((is_cw | is_acw) &&
-                        (step_age >= MIN_STEP_CYCLES[7:0])) begin
+                    end else if ((is_cw || is_acw) &&
+                        (step_age >= MIN_STEP_CYCLES)) begin
                         step_pulse <= 1'b1;
                         dir <= is_cw;
                         step_age <= 8'd0;
@@ -133,9 +124,10 @@ module quad_to_pos_12bit #(
                 end
             end
             
-            pos12 <= pos14[13:2];
             prev <= curr;
         end
     end
+    
+    assign pos12 = pos14[13:2];
     
 endmodule

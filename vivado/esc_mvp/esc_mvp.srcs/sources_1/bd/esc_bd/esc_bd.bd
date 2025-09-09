@@ -2019,7 +2019,7 @@
       },
       "axi_probe_0": {
         "vlnv": "xilinx.com:user:axi_probe:1.0",
-        "ip_revision": "4",
+        "ip_revision": "5",
         "xci_name": "esc_bd_axi_probe_0_4",
         "xci_path": "ip\\esc_bd_axi_probe_0_4\\esc_bd_axi_probe_0_4.xci",
         "inst_hier_path": "axi_probe_0"
@@ -2280,6 +2280,11 @@
           "timing_state_q": {
             "direction": "O",
             "left": "2",
+            "right": "0"
+          },
+          "pos12_q": {
+            "direction": "O",
+            "left": "11",
             "right": "0"
           }
         }
@@ -2556,6 +2561,12 @@
         "ports": [
           "esc_mvp_top_0/pgd_q",
           "axi_probe_0/pgd"
+        ]
+      },
+      "esc_mvp_top_0_pos12_q": {
+        "ports": [
+          "esc_mvp_top_0/pos12_q",
+          "axi_probe_0/pos12"
         ]
       },
       "esc_mvp_top_0_pwm_ctr_en_q": {

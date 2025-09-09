@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Fri Sep  5 16:26:48 2025" VIVADOVERSION="2024.2">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Tue Sep  9 15:52:02 2025" VIVADOVERSION="2024.2">
 
   <SYSTEMINFO ARCH="zynq" BOARD="tul.com.tw:pynq-z2:part0:1.0" DEVICE="7z020" NAME="esc_bd" PACKAGE="clg400" SPEEDGRADE="-1"/>
 
@@ -314,7 +314,7 @@
   </EXTERNALINTERFACES>
 
   <MODULES>
-    <MODULE COREREVISION="4" FULLNAME="/axi_probe_0" HWVERSION="1.0" INSTANCE="axi_probe_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="axi_probe" VLNV="xilinx.com:user:axi_probe:1.0">
+    <MODULE COREREVISION="5" FULLNAME="/axi_probe_0" HWVERSION="1.0" INSTANCE="axi_probe_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="axi_probe" VLNV="xilinx.com:user:axi_probe:1.0">
       <DOCUMENTS/>
       <ADDRESSBLOCKS>
         <ADDRESSBLOCK ACCESS="" INTERFACE="S00_AXI" NAME="S00_AXI_reg" RANGE="4096" USAGE="register"/>
@@ -426,6 +426,11 @@
         <PORT DIR="I" NAME="pgd" SIGIS="undef" SIGNAME="esc_mvp_top_0_pgd_q">
           <CONNECTIONS>
             <CONNECTION INSTANCE="esc_mvp_top_0" PORT="pgd_q"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="I" LEFT="11" NAME="pos12" RIGHT="0" SIGIS="undef" SIGNAME="esc_mvp_top_0_pos12_q">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="esc_mvp_top_0" PORT="pos12_q"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="pwm_ctr_en" SIGIS="undef" SIGNAME="esc_mvp_top_0_pwm_ctr_en_q">
@@ -1301,6 +1306,11 @@
         <PORT DIR="O" NAME="pgd_q" SIGIS="undef" SIGNAME="esc_mvp_top_0_pgd_q">
           <CONNECTIONS>
             <CONNECTION INSTANCE="axi_probe_0" PORT="pgd"/>
+          </CONNECTIONS>
+        </PORT>
+        <PORT DIR="O" LEFT="11" NAME="pos12_q" RIGHT="0" SIGIS="undef" SIGNAME="esc_mvp_top_0_pos12_q">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="axi_probe_0" PORT="pos12"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="pwm_ctr_en_q" SIGIS="undef" SIGNAME="esc_mvp_top_0_pwm_ctr_en_q">
