@@ -1,0 +1,30 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "xlnx, zynq-7000";
+	
+	fragment@0 {
+		target = <&spi0>;
+		__overlay__ {
+			status = "okay";
+			num-cs = <2>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			spidev0: spidev@0 {
+				compatible = "linux,spidev", "rohm,dh2228fv";
+				reg = <0>; // CS0 - adc_cs_n
+				spi-max-frequency = <1000000>;
+				status = "okay";
+			};
+
+			spidev1: spidev@1 {
+				compatible = "linux,spidev", "rohm,dh2228fv";
+				reg = <1>; // CS1 - drv_cs_n
+				spi-max-frequency = <1000000>;
+				status = "okay";
+			};
+		};
+	};
+};
