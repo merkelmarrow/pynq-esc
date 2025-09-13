@@ -92,7 +92,7 @@ module esc_mvp_top(
     output wire miso_q,
     output wire pgd_q,
     
-    // debug
+    // axi
     output wire mmcm1_locked_q,
     output wire mmcm2_locked_q,
     output wire rst_ctrl_q,
@@ -103,7 +103,10 @@ module esc_mvp_top(
     output wire [2:0]drdy_idx_q,
     output wire [11:0]pwm_phase_q,
     output wire [2:0]timing_state_q,
-    output wire [11:0]pos12_q
+    output wire [11:0]pos12_q,
+    
+    input wire sw_enable,
+    input wire sw_clear_fault    
     );
     
     // debug outputs
@@ -278,6 +281,29 @@ module esc_mvp_top(
         .dir(dir),
         .illegal(enc_illegal)
     );
+    
+    reg adc_rst_n_reg;
+    
+    always @(posedge clk_ctrl) begin
+        if (!mmcm1_locked || !mmcm2_locked) adc_rst_n_reg <= 1'b0;
+        else adc_rst_n_reg <= 1'b1;
+    end
+    
+    assign adc_rst_n = adc_rst_n_reg;
+    
+    wire trip_src = nfault || enc_illegal || timing_fault || ~mmcm1_locked || ~mmcm2_locked || ~pgd;
+    wire pwm_run_enabled, pwm_fault_latched;
+    
+    pwm_kill u_pwm_kill (
+        .clk_ctrl(clk_ctrl),
+        .rst_ctrl(rst_ctrl),
+        .trip_src(trip_src),
+        .sw_enable(sw_enable),
+        .sw_clear_fault(sw_clear_fault),
+        .run_en(pwm_run_enabled),
+        .fault_latched(pwm_fault_latched)
+    );
+        
     
     assign mmcm1_locked_q = mmcm1_locked;
     assign mmcm2_locked_q = mmcm2_locked;
