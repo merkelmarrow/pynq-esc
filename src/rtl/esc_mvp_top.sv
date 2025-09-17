@@ -107,6 +107,11 @@ module esc_mvp_top(
     input wire sw_enable,
     input wire sw_clear_fault,
     
+    input wire [11:0]sw_pwm_duty,
+    input wire sw_dir,
+    input wire sw_brake,
+    input wire sw_coast,
+    
     output wire fault_latched,
     output wire clk_ctrl_out
     );
@@ -308,7 +313,33 @@ module esc_mvp_top(
         .fault_latched(pwm_fault_latched)
     );
     
-    assign fault_latched = pwm_fault_latched;    
+    assign fault_latched = pwm_fault_latched;
+    
+    assign drv_en = pwm_run_enabled;
+    
+    six_step_commutator u_sixstep (
+        .clk_ctrl(clk_ctrl),
+        .rst_ctrl(rst_ctrl),
+        .run_en(pwm_run_enabled),
+        
+        .pwm_ctr(pwm_phase),
+        
+        .hall_1(hall_1),
+        .hall_2(hall_2),
+        .hall_3(hall_3),
+        
+        .duty(sw_pwm_duty),
+        .dir(sw_dir),
+        .brake(sw_brake),
+        .coast(sw_coast),
+        
+        .inha(inha),
+        .inla(inla),
+        .inhb(inhb),
+        .inlb(inlb),
+        .inhc(inhc),
+        .inlc(inlc)
+    );
     
     assign mmcm1_locked_q = mmcm1_locked;
     assign mmcm2_locked_q = mmcm2_locked;
