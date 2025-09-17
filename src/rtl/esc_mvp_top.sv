@@ -127,7 +127,6 @@ module esc_mvp_top(
     assign enc_B_q = enc_B;
     assign nfault_q = nfault;
     assign pgd_q = pgd;
-    assign clk_ctrl_out = clk_ctrl;
     
     wire mclk;
     wire mmcm1_locked;
@@ -185,6 +184,8 @@ module esc_mvp_top(
         .clk_out1 (clk_ctrl),
         .locked (mmcm2_locked)
     );
+    
+    assign clk_ctrl_out = clk_ctrl;
     
     // reset: async assert, sync deassert to clk_ctrl
     (* ASYNC_REG = "TRUE" *) reg [1:0]rst_sync;

@@ -35,6 +35,11 @@
 		
 		output wire sw_enable_pwm,
 		output wire sw_clear_fault,
+		
+		output wire [11:0]sw_pwm_duty,
+		output wire sw_dir,
+		output wire sw_brake,
+		output wire sw_coast,
 		// User ports ends
 		// Do not modify the ports beyond this line
 
@@ -431,7 +436,8 @@
     `SYNC_BUS(timing_state, 3)
     `SYNC_BUS(pwm_phase, 12)
     `SYNC_BUS(bus_voltage, 12)
-    `SYNC_BUS(pos12, 12)
+    `SYNC_BUS(pos12, 12)  
+    
     
     // packing the bits into words
     wire [15:0]live0 = {
@@ -510,6 +516,40 @@
     end
     
     assign sw_clear_fault = sw_clear_fault_bit_d ^ sw_clear_fault_bit_ctrl;
+    
+    
+    `define REVERSE_SYNC_BUS(sig, W) \
+        (* ASYNC_REG = "TRUE" *) reg [W-1:0]sig``_q1; \
+        (* ASYNC_REG = "TRUE" *) reg [W-1:0]sig``_q2; \
+        reg [W-1:0]sig``_ctrl_r; \
+        always @(posedge clk_ctrl or posedge rst_ctrl) begin \
+            if (rst_ctrl) begin \
+                sig``_q1 <= {W{1'b0}}; \
+                sig``_q2 <= {W{1'b0}}; \
+                sig``_ctrl_r <= {W{1'b0}}; \
+            end else begin \
+                sig``_q1 <= sig; \
+                sig``_q2 <= sig``_q1; \
+                if (sig``_q1 == sig``_q2) sig``_ctrl_r <= sig``_q2; \
+            end \
+        end \
+        wire [W-1:0]sig``_ctrl = sig``_ctrl_r;
+      
+    wire [11:0]sw_pwm_duty_axi = slv_reg6[11:0];
+    wire sw_dir_bit = slv_reg6[12];
+    wire sw_brake_bit = slv_reg6[13];
+    wire sw_coast_bit = slv_reg6[14];
+    
+    `REVERSE_SYNC_BUS(sw_pwm_duty_axi, 12)
+    `REVERSE_SYNC(sw_dir_bit)
+    `REVERSE_SYNC(sw_brake_bit)
+    `REVERSE_SYNC(sw_coast_bit)
+    
+    assign sw_pwm_duty = sw_pwm_duty_axi_ctrl;
+    assign sw_dir = sw_dir_bit_ctrl;
+    assign sw_brake = sw_brake_bit_ctrl;
+    assign sw_coast = sw_coast_bit_ctrl;
+    
 	// User logic ends
 
 	endmodule

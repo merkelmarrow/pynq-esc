@@ -2019,7 +2019,7 @@
       },
       "axi_probe_0": {
         "vlnv": "xilinx.com:user:axi_probe:1.0",
-        "ip_revision": "6",
+        "ip_revision": "7",
         "xci_name": "esc_bd_axi_probe_0_4",
         "xci_path": "ip\\esc_bd_axi_probe_0_4\\esc_bd_axi_probe_0_4.xci",
         "inst_hier_path": "axi_probe_0"
