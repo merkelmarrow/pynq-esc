@@ -307,7 +307,7 @@ module esc_mvp_top(
         .fault_latched(pwm_fault_latched)
     );
     
-    assign fault_latched = pwm_fault_latched;
+    assign fault_latched = pwm_fault_latched;    
     
     assign mmcm1_locked_q = mmcm1_locked;
     assign mmcm2_locked_q = mmcm2_locked;
