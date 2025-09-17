@@ -89,7 +89,6 @@ module esc_mvp_top(
     output wire enc_A_q,
     output wire enc_B_q,
     output wire nfault_q,
-    output wire miso_q,
     output wire pgd_q,
     
     // axi
@@ -106,7 +105,10 @@ module esc_mvp_top(
     output wire [11:0]pos12_q,
     
     input wire sw_enable,
-    input wire sw_clear_fault    
+    input wire sw_clear_fault,
+    
+    output wire fault_latched,
+    output wire clk_ctrl_out
     );
     
     // debug outputs
@@ -125,6 +127,7 @@ module esc_mvp_top(
     assign enc_B_q = enc_B;
     assign nfault_q = nfault;
     assign pgd_q = pgd;
+    assign clk_ctrl_out = clk_ctrl;
     
     wire mclk;
     wire mmcm1_locked;
@@ -303,7 +306,8 @@ module esc_mvp_top(
         .run_en(pwm_run_enabled),
         .fault_latched(pwm_fault_latched)
     );
-        
+    
+    assign fault_latched = pwm_fault_latched;
     
     assign mmcm1_locked_q = mmcm1_locked;
     assign mmcm2_locked_q = mmcm2_locked;

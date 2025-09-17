@@ -78,7 +78,6 @@
         "enc_A_q": [ { "direction": "out" } ],
         "enc_B_q": [ { "direction": "out" } ],
         "nfault_q": [ { "direction": "out" } ],
-        "miso_q": [ { "direction": "out" } ],
         "pgd_q": [ { "direction": "out" } ],
         "mmcm1_locked_q": [ { "direction": "out" } ],
         "mmcm2_locked_q": [ { "direction": "out" } ],
@@ -90,7 +89,11 @@
         "drdy_idx_q": [ { "direction": "out", "size_left": "2", "size_right": "0" } ],
         "pwm_phase_q": [ { "direction": "out", "size_left": "11", "size_right": "0" } ],
         "timing_state_q": [ { "direction": "out", "size_left": "2", "size_right": "0" } ],
-        "pos12_q": [ { "direction": "out", "size_left": "11", "size_right": "0" } ]
+        "pos12_q": [ { "direction": "out", "size_left": "11", "size_right": "0" } ],
+        "sw_enable": [ { "direction": "in" } ],
+        "sw_clear_fault": [ { "direction": "in" } ],
+        "fault_latched": [ { "direction": "out" } ],
+        "clk_ctrl_out": [ { "direction": "out" } ]
       },
       "interfaces": {
         "adc_rst_n": {

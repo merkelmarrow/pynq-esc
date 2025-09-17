@@ -2019,7 +2019,7 @@
       },
       "axi_probe_0": {
         "vlnv": "xilinx.com:user:axi_probe:1.0",
-        "ip_revision": "5",
+        "ip_revision": "6",
         "xci_name": "esc_bd_axi_probe_0_4",
         "xci_path": "ip\\esc_bd_axi_probe_0_4\\esc_bd_axi_probe_0_4.xci",
         "inst_hier_path": "axi_probe_0"
@@ -2240,9 +2240,6 @@
           "nfault_q": {
             "direction": "O"
           },
-          "miso_q": {
-            "direction": "O"
-          },
           "pgd_q": {
             "direction": "O"
           },
@@ -2286,6 +2283,18 @@
             "direction": "O",
             "left": "11",
             "right": "0"
+          },
+          "sw_enable": {
+            "direction": "I"
+          },
+          "sw_clear_fault": {
+            "direction": "I"
+          },
+          "fault_latched": {
+            "direction": "O"
+          },
+          "clk_ctrl_out": {
+            "direction": "O"
           }
         }
       }
@@ -2357,6 +2366,18 @@
         "ports": [
           "ar_an5_p_0",
           "esc_mvp_top_0/ar_an5_p"
+        ]
+      },
+      "axi_probe_0_sw_clear_fault": {
+        "ports": [
+          "axi_probe_0/sw_clear_fault",
+          "esc_mvp_top_0/sw_clear_fault"
+        ]
+      },
+      "axi_probe_0_sw_enable_pwm": {
+        "ports": [
+          "axi_probe_0/sw_enable_pwm",
+          "esc_mvp_top_0/sw_enable"
         ]
       },
       "clk_125_in_0_1": {
@@ -2443,6 +2464,12 @@
           "axi_probe_0/bus_voltage"
         ]
       },
+      "esc_mvp_top_0_clk_ctrl_out": {
+        "ports": [
+          "esc_mvp_top_0/clk_ctrl_out",
+          "axi_probe_0/clk_ctrl"
+        ]
+      },
       "esc_mvp_top_0_compute_trig_q": {
         "ports": [
           "esc_mvp_top_0/compute_trig_q",
@@ -2483,6 +2510,12 @@
         "ports": [
           "esc_mvp_top_0/enc_B_q",
           "axi_probe_0/enc_B"
+        ]
+      },
+      "esc_mvp_top_0_fault_latched": {
+        "ports": [
+          "esc_mvp_top_0/fault_latched",
+          "axi_probe_0/fault_latched"
         ]
       },
       "esc_mvp_top_0_hall_1_q": {

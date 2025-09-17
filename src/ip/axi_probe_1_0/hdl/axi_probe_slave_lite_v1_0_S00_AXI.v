@@ -22,13 +22,19 @@
 		input wire enc_A, enc_B,
 		input wire nfault, pgd,
 		input wire mmcm1_locked, mmcm2_locked,
-		input wire rst_ctrl, 
 		input wire pwm_ctr_en, compute_trig, timing_fault, adc_sync_req,
+		input wire fault_latched,
 		input wire [2:0]drdy_idx,
 		input wire [11:0]pwm_phase,
 		input wire [11:0]bus_voltage,
 		input wire [2:0]timing_state,
 		input wire [11:0]pos12,
+		
+		input wire clk_ctrl,
+		input wire rst_ctrl,
+		
+		output wire sw_enable_pwm,
+		output wire sw_clear_fault,
 		// User ports ends
 		// Do not modify the ports beyond this line
 
@@ -400,6 +406,7 @@
     `SYNC(compute_trig)
     `SYNC(timing_fault)
     `SYNC(adc_sync_req)
+    `SYNC(fault_latched)
     
     // synchronise all the multi-bit inputs
     
@@ -428,7 +435,7 @@
     
     // packing the bits into words
     wire [15:0]live0 = {
-        1'b0, // 15, reserved
+        fault_latched, // 15
         pgd_axi, // 14
         nfault_axi, // 13
         enc_B_axi, // 12
@@ -475,7 +482,34 @@
         end
     end
     
-
+    `define REVERSE_SYNC(sig) \
+        (* ASYNC_REG = "TRUE" *) reg sig``_q1; \
+        (* ASYNC_REG = "TRUE" *) reg sig``_q2; \
+        always @(posedge clk_ctrl or posedge rst_ctrl) begin \
+            if (rst_ctrl) begin sig``_q1 <= 1'b0; sig``_q2 <= 1'b0; end \
+            else begin sig``_q1 <= sig; sig``_q2 <= sig``_q1; end \
+        end \
+        wire sig``_ctrl = sig``_q2;
+        
+    wire sw_enable_pwm_bit = slv_reg5[0];
+    wire sw_clear_fault_bit = slv_reg5[1];
+        
+    `REVERSE_SYNC(sw_enable_pwm_bit)
+    `REVERSE_SYNC(sw_clear_fault_bit)
+    
+    assign sw_enable_pwm = sw_enable_pwm_bit_ctrl;
+    
+    // clear fault is a bit toggle from software
+    reg sw_clear_fault_bit_d;
+    
+    always @(posedge clk_ctrl or posedge rst_ctrl) begin
+        if (rst_ctrl) sw_clear_fault_bit_d <= 1'b0;
+        else begin
+            sw_clear_fault_bit_d <= sw_clear_fault_bit_ctrl;
+        end
+    end
+    
+    assign sw_clear_fault = sw_clear_fault_bit_d ^ sw_clear_fault_bit_ctrl;
 	// User logic ends
 
 	endmodule

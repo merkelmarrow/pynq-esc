@@ -22,13 +22,19 @@
 		input wire enc_A, enc_B,
 		input wire nfault, pgd,
 		input wire mmcm1_locked, mmcm2_locked,
-		input wire rst_ctrl, 
 		input wire pwm_ctr_en, compute_trig, timing_fault, adc_sync_req,
+		input wire fault_latched,
 		input wire [2:0]drdy_idx,
 		input wire [11:0]pwm_phase,
 		input wire [11:0]bus_voltage,
 		input wire [2:0]timing_state,
 		input wire [11:0]pos12,
+		
+		input wire clk_ctrl,
+		input wire rst_ctrl, 
+		
+		output wire sw_enable_pwm,
+		output wire sw_clear_fault,
 		// User ports ends
 		// Do not modify the ports beyond this line
 
@@ -99,16 +105,22 @@
 		.pgd (pgd),
 		.mmcm1_locked (mmcm1_locked),
 		.mmcm2_locked (mmcm2_locked),
-		.rst_ctrl (rst_ctrl),
 		.timing_state (timing_state),
 		.pwm_ctr_en (pwm_ctr_en),
 		.compute_trig (compute_trig),
+		.fault_latched(fault_latched),
 		.timing_fault (timing_fault),
 		.adc_sync_req (adc_sync_req),
 		.drdy_idx (drdy_idx),
 		.pwm_phase (pwm_phase),
 		.bus_voltage (bus_voltage),
-		.pos12 (pos12)
+		.pos12 (pos12),
+		
+		.clk_ctrl(clk_ctrl),
+		.rst_ctrl(rst_ctrl),
+		
+		.sw_enable_pwm(sw_enable_pwm),
+		.sw_clear_fault(sw_clear_fault)
 	);
 
 	// Add user logic here
