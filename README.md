@@ -9,9 +9,13 @@ Field Oriented Control (FOC) is the dominant approach for high performance PMSM/
 
 Many commercially available motor controllers capable of implementing FOC hide their inner control loop. I wanted to create a precision motor controller that gives the user ultimate control and visibility of the loop while being able to iterate control algorithms quickly. The PYNQ-Z2 board available at Trinity was the perfect platform; high-speed deterministic control from the FPGA-accelerated current loop, while the supervisory loops run in software on the ARM cores. The PYNQ platform (Zynq 7020 SoC) is purpose-built to facilitate this hardware-software integration.
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/ffbeccc9-7608-4283-999e-1909cce8ff52" alt="Assembled custom power module plugged into the PYNQ-Z2.">
+</p>
+
 ### What I built
 
-I designed and built by hand a custom power module PCB for a 3-phase motor that plugs directly into the PYNQ-Z2, runs a deterministic 32 kHz commutation loop directly in FPGA logic while exposing all internals and supervisory control to software via the AXI protocol. To date I have validated quadrature and hall decoding, most power stages, SPI, AXI communication and high speed ADC data path, however I am currently debugging gate driver communication issues that are preventing actual motor commutation.
+I designed and built by hand a custom power module PCB for a 3-phase motor that plugs directly on top of the PYNQ-Z2, runs a deterministic 32 kHz commutation loop directly in FPGA logic while exposing all internals and supervisory control to software via the AXI protocol. To date I have validated quadrature and hall decoding, most power stages, SPI, AXI communication and high speed ADC data path, however I am currently debugging gate driver communication issues that are preventing actual motor commutation.
 
 #### Custom PCB
 
