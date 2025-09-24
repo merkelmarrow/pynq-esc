@@ -4,7 +4,7 @@
     "xci_name": "esc_bd_axi_probe_0_4",
     "cell_name": "axi_probe_0",
     "component_reference": "xilinx.com:user:axi_probe:1.0",
-    "ip_revision": "6",
+    "ip_revision": "7",
     "gen_directory": "../../../../../../esc_mvp.gen/sources_1/bd/esc_bd/ip/esc_bd_axi_probe_0_4",
     "parameters": {
       "component_parameters": {
@@ -33,7 +33,7 @@
       },
       "runtime_parameters": {
         "IPCONTEXT": [ { "value": "IP_Integrator" } ],
-        "IPREVISION": [ { "value": "6" } ],
+        "IPREVISION": [ { "value": "7" } ],
         "MANAGED": [ { "value": "TRUE" } ],
         "OUTPUTDIR": [ { "value": "../../../../../../esc_mvp.gen/sources_1/bd/esc_bd/ip/esc_bd_axi_probe_0_4" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],
@@ -75,6 +75,10 @@
         "rst_ctrl": [ { "direction": "in" } ],
         "sw_enable_pwm": [ { "direction": "out" } ],
         "sw_clear_fault": [ { "direction": "out" } ],
+        "sw_pwm_duty": [ { "direction": "out", "size_left": "11", "size_right": "0" } ],
+        "sw_dir": [ { "direction": "out" } ],
+        "sw_brake": [ { "direction": "out" } ],
+        "sw_coast": [ { "direction": "out" } ],
         "s00_axi_aclk": [ { "direction": "in" } ],
         "s00_axi_aresetn": [ { "direction": "in" } ],
         "s00_axi_awaddr": [ { "direction": "in", "size_left": "4", "size_right": "0" } ],

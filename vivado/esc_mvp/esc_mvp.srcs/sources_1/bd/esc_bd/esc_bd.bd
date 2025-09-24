@@ -2019,7 +2019,7 @@
       },
       "axi_probe_0": {
         "vlnv": "xilinx.com:user:axi_probe:1.0",
-        "ip_revision": "6",
+        "ip_revision": "7",
         "xci_name": "esc_bd_axi_probe_0_4",
         "xci_path": "ip\\esc_bd_axi_probe_0_4\\esc_bd_axi_probe_0_4.xci",
         "inst_hier_path": "axi_probe_0"
@@ -2290,6 +2290,20 @@
           "sw_clear_fault": {
             "direction": "I"
           },
+          "sw_pwm_duty": {
+            "direction": "I",
+            "left": "11",
+            "right": "0"
+          },
+          "sw_dir": {
+            "direction": "I"
+          },
+          "sw_brake": {
+            "direction": "I"
+          },
+          "sw_coast": {
+            "direction": "I"
+          },
           "fault_latched": {
             "direction": "O"
           },
@@ -2368,16 +2382,40 @@
           "esc_mvp_top_0/ar_an5_p"
         ]
       },
+      "axi_probe_0_sw_brake": {
+        "ports": [
+          "axi_probe_0/sw_brake",
+          "esc_mvp_top_0/sw_brake"
+        ]
+      },
       "axi_probe_0_sw_clear_fault": {
         "ports": [
           "axi_probe_0/sw_clear_fault",
           "esc_mvp_top_0/sw_clear_fault"
         ]
       },
+      "axi_probe_0_sw_coast": {
+        "ports": [
+          "axi_probe_0/sw_coast",
+          "esc_mvp_top_0/sw_coast"
+        ]
+      },
+      "axi_probe_0_sw_dir": {
+        "ports": [
+          "axi_probe_0/sw_dir",
+          "esc_mvp_top_0/sw_dir"
+        ]
+      },
       "axi_probe_0_sw_enable_pwm": {
         "ports": [
           "axi_probe_0/sw_enable_pwm",
           "esc_mvp_top_0/sw_enable"
+        ]
+      },
+      "axi_probe_0_sw_pwm_duty": {
+        "ports": [
+          "axi_probe_0/sw_pwm_duty",
+          "esc_mvp_top_0/sw_pwm_duty"
         ]
       },
       "clk_125_in_0_1": {

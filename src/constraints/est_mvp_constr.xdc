@@ -43,7 +43,7 @@ set_property -dict { PACKAGE_PIN Y17   IOSTANDARD LVCMOS33 } [get_ports { drdy_0
 
 set_property -dict { PACKAGE_PIN W19   IOSTANDARD LVCMOS33 } [get_ports { adc_mclk_out_0 }];
 set_property SLEW FAST [get_ports adc_mclk_out_0]
-set_property DRIVE 24 [get_ports adc_mclk_out_0]
+set_property DRIVE 16 [get_ports adc_mclk_out_0]
 #IO_L22N_T3_34 Sch=ja_n[4]
 
 

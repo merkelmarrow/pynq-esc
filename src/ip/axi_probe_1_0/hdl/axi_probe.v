@@ -35,6 +35,11 @@
 		
 		output wire sw_enable_pwm,
 		output wire sw_clear_fault,
+		
+		output wire [11:0]sw_pwm_duty,
+		output wire sw_dir,
+		output wire sw_brake,
+		output wire sw_coast,
 		// User ports ends
 		// Do not modify the ports beyond this line
 
@@ -120,7 +125,12 @@
 		.rst_ctrl(rst_ctrl),
 		
 		.sw_enable_pwm(sw_enable_pwm),
-		.sw_clear_fault(sw_clear_fault)
+		.sw_clear_fault(sw_clear_fault),
+		
+		.sw_pwm_duty(sw_pwm_duty),
+		.sw_dir(sw_dir),
+		.sw_brake(sw_brake),
+		.sw_coast(sw_coast)
 	);
 
 	// Add user logic here
